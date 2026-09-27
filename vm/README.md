@@ -102,10 +102,36 @@ vm/state.sh list
    umount -R /mnt; cryptsetup close root; poweroff
    ```
    Puis `state.sh save post-archinstall`. Premier démarrage : une seule passphrase, puis un TTY.
-3. `scp` du dépôt, puis `sudo decman --source …/source.py --dry-run --debug`, comparé à `pacman -Qqe`, puis le vrai run. Redémarrer, contrôler, puis `state.sh save post-decman`.
+
+   La passphrase peut être tapée depuis l'hôte, ce qui évite la console. `send-key` envoie des codes de touches physiques, et les lettres de `test` sont au même endroit en qwerty et en azerty. Il faut attendre que l'invite soit affichée (45 s suffisent), sinon les touches se perdent :
+   ```fish
+   virsh -c qemu:///system start arch-test; sleep 45
+   virsh -c qemu:///system send-key arch-test KEY_T KEY_E KEY_S KEY_T; virsh -c qemu:///system send-key arch-test KEY_ENTER
+   ```
+3. decman :
+   - **Première fois**, l'installer depuis l'AUR à la main. Root installe les dépendances de compilation, `gaugendre` compile (makepkg refuse de tourner en root), puis root installe le paquet :
+     ```sh
+     cd /tmp && sudo -u gaugendre git clone https://aur.archlinux.org/decman.git && cd decman
+     pacman -S --needed --asdeps $(sudo -u gaugendre makepkg --printsrcinfo | awk -F' = ' '/^\t(make)?depends = /{print $2}' | sed 's/[<>=].*//')
+     sudo -u gaugendre makepkg --nocheck && pacman -U ./*.pkg.tar.zst
+     ```
+   - `scp` du dépôt, puis `decman --source …/source.py --dry-run --debug`, à comparer avec `pacman -Qqe`.
+   - Le vrai run se lance dans un terminal, parce que pacman pose ses questions. Depuis un SSH non interactif, on passe par `vm/answer.py decman`, qui répond `y` aux confirmations et Entrée aux choix numérotés.
+   - Redémarrer, contrôler, puis `state.sh save post-decman`.
 4. `chezmoi init`, puis `git-crypt unlock`, puis `chezmoi apply` depuis un TTY, puis la première connexion graphique.
 
 En cas d'échec à une étape : `state.sh reset <état précédent>`.
+
+## Naviguer dans le menu Limine
+
+Le menu s'affiche environ 3,5 s après le redémarrage, pendant 3 s. Une flèche envoyée à ce moment arrête le compte à rebours ; ensuite, on navigue sans se presser en vérifiant sur une capture d'écran :
+
+```fish
+virsh -c qemu:///system send-key arch-test KEY_DOWN
+virsh -c qemu:///system screenshot arch-test /tmp/menu.ppm   # magick /tmp/menu.ppm /tmp/menu.png pour l'ouvrir
+```
+
+Entrée ouvre un dossier (Snapshots, puis un snapshot) ou démarre une entrée.
 
 ## Limites de la VM
 
