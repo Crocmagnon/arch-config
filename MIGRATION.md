@@ -321,6 +321,16 @@ Les secrets de srv-1 ne sont pas touchés.
 - **Sur Arch, KWallet et non gnome-keyring**, parce que c'est le coffre natif de Plasma et qu'il est déjà ouvert à l'autologin. Deux coffres en concurrence pour Secret Service ne feraient que compliquer les choses. `PINENTRY_KDE_USE_WALLET=1` est gardé : il est sans effet si `XDG_SESSION_DESKTOP` n'y vaut pas `KDE` (non vérifié). **Repli** si la VM montre que KWallet n'expose pas Secret Service : reprendre le setup du travail (`gnome-keyring` + `pinentry-gnome3`).
 - **Headless (serveur du travail)** : pas de wallet ; on garde le TTL long actuel.
 
+**Validé en VM (27/09/2026), GPG et SSH :**
+- **Premier usage :** pinentry-qt propose « Save in password manager » ; la passphrase part dans `kdewallet` (schéma `org.gnupg.Passphrase`).
+- **Ensuite :** plus aucune fenêtre, même cache vidé et après un redémarrage (wallet ouvert à l'autologin).
+- **Pour SSH, un piège :** gpg-agent démarre environ 1 s **avant** la session Plasma, donc sans écran. Or une requête SSH ne transporte pas d'écran, et pinentry échoue (« agent refused operation »).
+- **Correctif standard :** `gpg-connect-agent updatestartuptty /bye`, lancé de deux endroits :
+  - une entrée d'autostart XDG (`~/.config/autostart/gpg-agent-display.desktop`), pour la session ;
+  - chaque fish interactif, qui pose aussi `GPG_TTY` (terminal, SSH).
+  - Testé : après un redémarrage, sans terminal ouvert, un `ssh` sans écran passe sans fenêtre.
+- **Import d'une clé SSH (une fois) :** `ssh-add ~/.ssh/id_ed25519` demande la passphrase du fichier, puis une passphrase pour la copie que garde gpg-agent (on peut remettre la même).
+
 **Migration des clés.** Elles sont aujourd'hui dans `~/.local/share/gnupg` (NixOS). On les restaure dans `~/.gnupg` (`gpg --export-secret-keys` / `--import`, ou copie du dossier, `chmod 700`). La clé SSH s'importe dans gpg-agent avec `ssh-add ~/.ssh/id_ed25519`. srv-1 n'est pas touché.
 
 ---
