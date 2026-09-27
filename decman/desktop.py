@@ -57,6 +57,8 @@ class Desktop(Module):
             "/etc/pam.d/plasmalogin-autologin": File(
                 source_file="./files/desktop/plasmalogin-autologin"
             ),
+            # rp_filter lâche pour l'exit node Tailscale : voir le fichier.
+            "/etc/ufw/sysctl.conf": File(source_file="./files/desktop/ufw-sysctl.conf"),
         }
 
     # Aussi appelé au premier run. ponytail: additif, ufw ignore une règle déjà présente ; une

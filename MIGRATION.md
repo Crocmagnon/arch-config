@@ -168,7 +168,7 @@ Le Arch Wiki bloque les lectures automatiques. Les pages KDE Wallet, Snapper et 
 | Bluetooth | L+D | dm | `bluez bluez-utils` + `bluetooth.service` | |
 | Polices | L+D | dm | `ttf-dejavu ttf-liberation noto-fonts noto-fonts-emoji ttf-jetbrains-mono-nerd ttf-fira-sans ttf-montserrat` | Polices sous licence : §5. |
 | Docker | L+D | dm | `docker` + `docker.socket` | |
-| Tailscale (client) | L+D | dm + man. | `tailscale` + `tailscaled.service` | Pas de sysctl : `rp_filter=2` est déjà le défaut systemd. **Contrôle après démarrage** : ufw peut le remettre à 1 via `/etc/ufw/sysctl.conf` (non vérifié), et c'est là qu'il faudrait corriger. |
+| Tailscale (client) | L+D | dm + man. | `tailscale` + `tailscaled.service` | `rp_filter=2` est le défaut systemd, mais ufw le remet à 1 au démarrage via `/etc/ufw/sysctl.conf` (constaté sur le laptop le 28/09/2026) : decman gère ce fichier avec `rp_filter=2`. |
 | Pare-feu | L+D | dm | `ufw` + règles (KDE Connect 1714-1764/tcp+udp) | |
 | iPhone | L+D | dm | `usbmuxd libimobiledevice ifuse` | |
 | nRF Connect | L+D | dm (AUR) | `nrfconnect-appimage nrfutil nrf-udev jlink-software-and-documentation` | |
