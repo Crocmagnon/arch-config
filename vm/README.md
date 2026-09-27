@@ -135,6 +135,12 @@ virsh -c qemu:///system screenshot arch-test /tmp/menu.ppm   # magick /tmp/menu.
 
 Entrée ouvre un dossier (Snapshots, puis un snapshot) ou démarre une entrée.
 
+## Pièges de `send-key`
+
+- **Une touche par appel.** Deux touches identiques dans un même appel n'en donnent qu'une : `KEY_R KEY_O KEY_O KEY_T` tape `rot`.
+- **Les `KEY_*` sont des touches physiques**, nommées d'après la disposition qwerty. Le live est en qwerty, mais le système installé est en azerty. On y tape `a` avec `KEY_Q`, `z` avec `KEY_W`, `w` avec `KEY_Z`, `q` avec `KEY_A`, `m` avec `KEY_SEMICOLON`, et les chiffres demandent Maj.
+- **Si on s'est coupé du SSH** (par exemple avec ufw), on se connecte en root sur tty1 avec `send-key` et on corrige depuis la console.
+
 ## Limites de la VM
 
 - **L'hibernation ne se teste pas dans la VM.** Le processus va bien jusqu'à `PM: hibernation: resume from hibernation` : l'image est retrouvée via `HibernateLocation`, et la passphrase n'est demandée qu'une fois. Puis la VM redémarre pendant la restauration de la mémoire, sans message (essayé le 27/09/2026, avec `--cpu host-passthrough`). On la teste sur le vrai laptop.

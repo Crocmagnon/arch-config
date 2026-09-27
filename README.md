@@ -13,7 +13,7 @@ Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config,
 | Paquets, fichiers `/etc`, unités systemd, snapshots | [decman](https://github.com/kiviktnm/decman) | `decman/` |
 | Fichiers utilisateur | chezmoi | dépôt dotfiles |
 
-> **État (27/09/2026).** Migration depuis NixOS en cours. Validés dans la VM de test, de bout en bout sur une installation neuve : archinstall, puis les modules decman `base` et `boot` en un seul run, jusqu'au démarrage sur un snapshot. Restent à faire : les modules `desktop` et d'hôte, puis chezmoi. Le plan et les décisions sont dans [MIGRATION.md](MIGRATION.md).
+> **État (27/09/2026).** Migration depuis NixOS en cours. Validés dans la VM de test, de bout en bout sur une installation neuve : archinstall, puis les modules decman `base` et `boot` en un seul run, jusqu'au démarrage sur un snapshot ; puis le module `desktop` (Plasma en autologin, wallet ouvert par la passphrase LUKS, ufw, Flatpak). Restent à faire : le module `apps`, les modules d'hôte, puis chezmoi. Le plan et les décisions sont dans [MIGRATION.md](MIGRATION.md).
 
 ## Installer une machine
 
@@ -36,7 +36,7 @@ Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config,
    sudo decman --source /chemin/vers/arch-config/decman/source.py --dry-run --debug
    sudo decman --source /chemin/vers/arch-config/decman/source.py
    ```
-   Le `--dry-run` doit n'enlever aucun paquet utile. Comparer sa sortie avec `pacman -Qqe`. Le chemin de la source n'est mémorisé qu'au premier vrai run : ce run-là prend donc aussi `--source`, et les suivants s'en passent.
+   Le premier run n'installe pas les Flatpak : le plugin Flatpak de decman est chargé au démarrage, avant que pacman n'installe `flatpak`. Un second `sudo decman` s'en charge. Le `--dry-run` doit n'enlever aucun paquet utile. Comparer sa sortie avec `pacman -Qqe`. Le chemin de la source n'est mémorisé qu'au premier vrai run : ce run-là prend donc aussi `--source`, et les suivants s'en passent.
 
 Les étapes manuelles (sauvegardes, secrets, comptes) sont listées dans [MIGRATION.md §7](MIGRATION.md#7-étapes).
 
@@ -59,6 +59,13 @@ Ses `custom_commands` font deux choses :
 - `boot.py` : Limine avec `limine-mkinitcpio-hook`, la ligne de commande du noyau (`/etc/kernel/cmdline`), snapper, snap-pac et `limine-snapper-sync`.
   - Chaque transaction pacman crée un snapshot avant et un après, et chacun devient démarrable depuis le menu Limine avec son propre noyau.
   - Au premier run, le module migre l'installation Limine d'archinstall vers celle de l'outil.
+
+- `desktop.py` : la session Plasma et les services du bureau.
+  - Plasma et ses applications, plasma-login-manager en autologin.
+  - Le wallet KDE ouvert à l'autologin avec la passphrase LUKS : `pam_systemd_loadkey` dans une copie de `plasmalogin-autologin`, et `KeyringMode=inherit` sur `plasmalogin.service`.
+  - Audio, Bluetooth, impression, Docker, Tailscale, iPhone.
+  - ufw (entrée refusée, sauf KDE Connect), Flatpak (PrusaSlicer).
+- `source.py` ajoute aussi l'utilisateur aux groupes `docker`, `uucp` (ports série) et `input`.
 
 ## Revenir en arrière
 

@@ -121,8 +121,8 @@ Le Arch Wiki bloque les lectures automatiques. Les pages KDE Wallet, Snapper et 
 | Fonctionnalité | Hôte | Cible | Arch | Note |
 |---|---|---|---|---|
 | Plasma 6 | L+D | dm | `plasma-meta` + applications (voir sous le tableau) | |
-| Autologin | L+D | dm | config plasma-login-manager | Chemin exact du fichier à vérifier dans la VM. |
-| Wallet ouvert à l'autologin | L+D | dm | une ligne `pam_systemd_loadkey` ajoutée à `/etc/pam.d/plasmalogin-autologin` (copie du fichier fourni dans `/usr/lib/pam.d/`) + drop-in `plasmalogin.service.d/keyring.conf` (`KeyringMode=inherit`) | Recette du Arch Wiki « KDE Wallet », sans réécriture de PAM. Le wallet a le même mot de passe que LUKS. |
+| Autologin | L+D | dm | `/etc/plasmalogin.conf.d/autologin.conf` (`[Autologin] User= Session=plasma`) | Clés lues dans le code de plasma-login-manager (`src/common/mainconfig.kcfg`). Validé en VM. |
+| Wallet ouvert à l'autologin | L+D | dm | une ligne `pam_systemd_loadkey` ajoutée à `/etc/pam.d/plasmalogin-autologin` (copie du fichier fourni dans `/usr/lib/pam.d/`) + drop-in `plasmalogin.service.d/keyring.conf` (`KeyringMode=inherit`) | Recette du Arch Wiki « KDE Wallet », sans réécriture de PAM. Le wallet a le même mot de passe que LUKS. Validé en VM : `kdewallet` est créé et déverrouillé à l'autologin, et servi par `ksecretd` comme Secret Service. |
 | NetworkManager | L+D | dm | `networkmanager` + unité | |
 | Impression | L+D | dm | `cups` + `cups.socket` | |
 | fwupd | L+D | dm | `fwupd` | |
