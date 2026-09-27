@@ -12,24 +12,33 @@ from amd import Amd
 from apps import Apps
 from boot import Boot
 from desktop import Desktop
+from framework_gab_amd import FrameworkGabAmd
 
 # Un fichier /etc appartenant à un paquet pas encore installé ferait échouer pacman
 # (« existe déjà dans le système de fichiers ») : on installe d'abord, on écrit ensuite.
 decman.execution_order = ["pacman", "aur", "flatpak", "files", "systemd"]
 
-KERNEL_PARAMS = {
-    "framework-gab-amd": ("amdgpu.dcdebugmask=0x10",),  # PSR (nixos-hardware)
-    "desktop-gab": ('acpi_osi="!Windows 2015"',),  # veille sur la B650 (nixos-hardware)
+# Par hôte : paramètres noyau en plus de ceux de boot.py, et modules propres.
+HOSTS = {
+    "framework-gab-amd": (
+        ("amdgpu.dcdebugmask=0x10",),  # PSR (nixos-hardware)
+        [Amd(), FrameworkGabAmd()],
+    ),
+    "desktop-gab": (
+        ('acpi_osi="!Windows 2015"',),  # veille sur la B650 (nixos-hardware)
+        [Amd()],
+    ),
 }
 
 host = socket.gethostname()
-if host not in KERNEL_PARAMS:
+if host not in HOSTS:
     raise SystemExit(f"hôte inconnu : {host}")
+kernel_params, host_modules = HOSTS[host]
 
 # Groupes créés par des paquets : appliqués en after_update, une fois les paquets installés.
-# docker ; uucp pour les ports série (dialout sous NixOS) ; input pour Rotatrix.
+# docker ; uucp pour les ports série (dialout sous NixOS) ; input pour Rotatrix ; libvirt.
 users = UserManager()
-for group in ("docker", "uucp", "input"):
+for group in ("docker", "uucp", "input", "libvirt"):
     users.add_user_to_group(USER, group)
 
 # Builds AUR : un utilisateur dédié, dont le trousseau reçoit les clés des sources signées
@@ -45,4 +54,4 @@ keys.receive_key(  # libudev0-shim, dépendance de jlink-software-and-documentat
     fingerprint="8703B6700E7EE06D7A39B8D6EDAE37B02CEB490D", keyserver="hkps://keyserver.ubuntu.com",
 )
 
-decman.modules += [Base(), Boot(KERNEL_PARAMS[host]), Desktop(), Apps(), Amd(), users, keys]
+decman.modules += [Base(), Boot(kernel_params), Desktop(), Apps(), *host_modules, users, keys]

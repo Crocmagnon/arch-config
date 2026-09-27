@@ -30,7 +30,7 @@ virsh -c qemu:///system net-start default
 set -x LIBVIRT_DEFAULT_URI qemu:///system
 set d /var/lib/libvirt/images/arch-test
 virt-install --name arch-test --osinfo archlinux \
-    --memory 4096 --vcpus 4 --cpu host-passthrough --machine q35 \
+    --memory 20480 --vcpus 14 --cpu host-passthrough --machine q35 \
     --boot uefi,firmware.feature0.name=secure-boot,firmware.feature0.enabled=no \
     --disk path=$d/current.qcow2,size=80,format=qcow2,bus=virtio,discard=unmap \
     --cdrom $d/archlinux-x86_64.iso \
@@ -43,7 +43,7 @@ Le choix des options :
 - **UEFI sans Secure Boot**, car l'ISO Arch n'est pas signée.
 - **NVRAM persistante**, créée par libvirt : Limine y inscrit son entrée de démarrage, et systemd y écrit `HibernateLocation`.
 - **`discard=unmap`**, pour pouvoir tester les discards à travers LUKS.
-- **4 Gio de RAM**, ce qui suffit pour Plasma. Sur le profil laptop, le swapfile prend la taille de la RAM, soit 4 Go ici.
+- **14 vCPU et 20 Gio**, sur un hôte de 16 threads et 30 Gio qui ne fait rien d'autre pendant les tests : les compilations AUR vont vite. Sur le profil laptop, le swapfile prend la taille de la RAM, soit 20 Go ici.
 
 Pour repartir d'un disque vierge (itérations sur archinstall), en ne jetant que le disque de travail et la définition de la VM, pas les états sauvegardés :
 

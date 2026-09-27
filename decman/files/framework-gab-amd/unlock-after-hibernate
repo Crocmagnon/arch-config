@@ -1,0 +1,31 @@
+#!/bin/sh
+# Hook systemd-sleep (repris de nixos-config) : au réveil d'une hibernation de plus de 5 min,
+# lever le verrouillage de Plasma, la passphrase LUKS venant d'être saisie. Deux gardes :
+# SYSTEMD_SLEEP_ACTION=hibernate (vraie reprise depuis l'image) et la durée (hiberner puis revenir
+# aussitôt reste verrouillé). Chemins absolus : les hooks de veille tournent avec un PATH minimal.
+stamp=/run/unlock-after-hibernate.stamp
+# ponytail: seuil 5 min ; ajuster si un contournement plus lent apparaît.
+threshold=300
+
+if [ "$1" = pre ]; then
+    /usr/bin/date +%s > "$stamp"
+    exit 0
+fi
+
+[ "$1" = post ] || exit 0
+[ "$SYSTEMD_SLEEP_ACTION" = hibernate ] || exit 0
+[ -r "$stamp" ] || exit 0
+read -r start < "$stamp"; /usr/bin/rm -f "$stamp"
+[ $(( $(/usr/bin/date +%s) - start )) -ge "$threshold" ] || exit 0
+
+# user.slice est gelée pendant le hook : on détache la levée du verrou. Le compositeur ignore un
+# Unlock trop précoce, d'où les essais répétés tant qu'une session reste verrouillée.
+# ponytail: plafond 30 s ; relever si insuffisant.
+exec /usr/bin/systemd-run --collect --unit=unlock-after-hibernate /bin/sh -c '
+for _ in $(seq 30); do
+    loginctl list-sessions --no-legend | while read -r s _; do
+        loginctl show-session "$s" -p LockedHint --value
+    done | grep -q "^yes$" || break
+    loginctl unlock-sessions
+    sleep 1
+done'

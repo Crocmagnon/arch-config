@@ -18,12 +18,17 @@ class Desktop(Module):
             "kate", "konsole", "khelpcenter", "kwalletmanager", "kdegraphics-thumbnailers",
             "ffmpegthumbs", "kio-admin", "kio-extras", "partitionmanager", "kdeconnect",
             "kitty", "wl-clipboard",
-            "pipewire-alsa", "pipewire-pulse", "wireplumber", "rtkit",
+            # Fournisseurs à choisir, sinon pacman pose la question : backend multimédia de Qt, et
+            # langues de l'OCR de Spectacle (le choix par défaut serait l'afrikaans).
+            "qt6-multimedia-ffmpeg", "tesseract-data-eng", "tesseract-data-fra",
+            "pipewire-alsa", "pipewire-pulse", "pipewire-jack", "wireplumber", "rtkit",  # jack : sinon pacman propose jack2
             "ttf-dejavu", "ttf-liberation", "noto-fonts", "noto-fonts-emoji",
             "ttf-jetbrains-mono-nerd", "ttf-fira-sans", "ttf-montserrat",
             "bluez", "bluez-utils", "cups", "fwupd",
             "docker", "tailscale", "ufw", "flatpak",
             "usbmuxd", "libimobiledevice", "ifuse",  # iPhone
+            # VM (virt-manager) : dnsmasq pour le réseau NAT « default », swtpm pour un TPM virtuel
+            "libvirt", "qemu-desktop", "virt-manager", "virtiofsd", "swtpm", "edk2-ovmf", "dnsmasq",
         }
 
     @flatpak.packages
@@ -35,7 +40,7 @@ class Desktop(Module):
     def units(self) -> set[str]:
         return {
             "plasmalogin.service", "bluetooth.service", "cups.socket",
-            "docker.socket", "tailscaled.service", "ufw.service",
+            "docker.socket", "tailscaled.service", "ufw.service", "libvirtd.socket",
         }
 
     def files(self) -> dict[str, File]:

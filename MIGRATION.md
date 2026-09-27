@@ -156,7 +156,7 @@ Le Arch Wiki bloque les lectures automatiques. Les pages KDE Wallet, Snapper et 
 | **Hibernation** (veille, puis hibernation après 60 min) | dm + pl | swap LUKS dans `crypttab.initramfs` ; `/etc/systemd/sleep.conf.d/hibernate.conf` (`HibernateDelaySec=60min`) ; powerdevil `SleepMode=3` (§4) | Pas de `resume=` : l'initramfs systemd retrouve l'image via la variable EFI `HibernateLocation` (`man systemd-hibernate-resume-generator`). Une seule saisie de passphrase, grâce au cache de systemd-cryptsetup. Vérifier que swap ≥ RAM. `HibernateMode=shutdown` (qui évitait le réveil tout seul en S4) : à remettre seulement si le problème revient. |
 | Pas de second mot de passe après une hibernation longue | dm | `/usr/lib/systemd/system-sleep/unlock-after-hibernate` | Gardé : Plasma n'a rien d'équivalent. Sur Arch, les hooks vont dans `/usr/lib/systemd/system-sleep/` (`man systemd-sleep`). |
 | Empreinte digitale (verrouillage d'écran, pas le login) | dm + man. | `fprintd` | Plasma fournit `/etc/pam.d/kde-fingerprint`, sans toucher au login. `fprintd-enroll`. |
-| Empreinte après une reprise de veille | dm (si besoin) | une unité `fprintd-sleep.service` | Bug réel côté fprintd. D'abord tester sans ; sinon une seule unité (`Before=sleep.target`, `ExecStart=` arrête fprintd, `ExecStop=` le redémarre et relance `kscreenlocker_greet`), sans script system-sleep. |
+| Empreinte après une reprise de veille | ✗ pour l'instant, à tester sur le vrai laptop | une unité `fprintd-sleep.service` | Bug réel côté fprintd. D'abord tester sans ; sinon une seule unité (`Before=sleep.target`, `ExecStart=` arrête fprintd, `ExecStop=` le redémarre et relance `kscreenlocker_greet`), sans script system-sleep. |
 | Capot fermé sur secteur : rien (KVM) | pl | powerdevil `AC/SuspendAndShutdown LidAction=0` | |
 | Réveil par le clavier/souris derrière le KVM | dm | `/etc/udev/rules.d/90-usb-wakeup.rules` | |
 | Carte Ethernet Framework (autosuspend 0bda:8156) | dm | `/etc/udev/rules.d/90-framework-ethernet.rules` | Carte possédée, gardée. |
@@ -171,8 +171,8 @@ Le Arch Wiki bloque les lectures automatiques. Les pages KDE Wallet, Snapper et 
 
 | Fonctionnalité | Cible | Arch | Note |
 |---|---|---|---|
-| OpenRGB | dm | `openrgb` + `/etc/modules-load.d/i2c.conf` (`i2c-dev`, `i2c-piix4`) | Le serveur `openrgb --server` n'est à garder que si tu t'en sers. |
-| VM (libvirt / virt-manager) | dm | `libvirt qemu-desktop virt-manager virtiofsd swtpm edk2-ovmf dnsmasq` + `libvirtd.socket` | |
+| OpenRGB | ✗ | — | Abandonné (non utilisé). |
+| VM (libvirt / virt-manager) | dm | `libvirt qemu-desktop virt-manager virtiofsd swtpm edk2-ovmf dnsmasq` + `libvirtd.socket`, groupe `libvirt` | Sur **les deux** machines (module `desktop`), plus seulement sur D. |
 | Veille sur la B650 | dm | `acpi_osi` (§2.1) | Optionnel : tester la veille sans. |
 
 ---

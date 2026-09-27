@@ -15,7 +15,8 @@ import sys
 
 CONFIRM = re.compile(rb"[\[(][Yy]/[Nn][\])]")
 REVIEW = re.compile(rb"Review PKGBUILD[^\n]*\?\s*$")
-SELECT = re.compile(rb"Enter a (number|selection)[^\n]*:\s*$")
+# Des séquences ANSI suivent parfois le « : » final (couleur, ou ESC[?25h qui réaffiche le curseur).
+SELECT = re.compile(rb"Enter a (number|selection)[^\n]*:(\s|\x1b\[[0-9;?]*[A-Za-z])*$")
 
 pid, fd = pty.fork()
 if pid == 0:
