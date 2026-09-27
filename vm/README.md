@@ -72,6 +72,8 @@ scp $o -r ~/Projects/codeberg.org/Crocmagnon/arch-config root@$ip:
 ssh $o root@$ip
 ```
 
+Sans console, on peut aussi taper `passwd` dans le live avec `virsh send-key`, dont les noms de touches `KEY_*` suivent la disposition qwerty du live, puis passer le mot de passe à `ssh-copy-id` par un script `SSH_ASKPASS` (`SSH_ASKPASS_REQUIRE=force`).
+
 `virt-install --cloud-init root-ssh-key=…` a été essayé : l'ISO signale cloud-init `done`, mais la clé n'est pas installée. On reste donc sur `passwd` + `ssh-copy-id`.
 
 Les fichiers passent par `scp` plutôt que par `--config-url` : pas de serveur HTTP sur l'hôte, et rien à ouvrir dans le pare-feu NixOS. `--config-url` (depuis codeberg) ne sert qu'aux vraies installations.
