@@ -54,7 +54,7 @@ Cibles :
 - **OpenSCAD :** `openscad-git` (AUR), l'équivalent de `openscad-unstable`. Il n'existe rien de précompilé et récent : les dépôts officiels, Flathub et AUR `-appimage` sont tous en 2021.01. Il n'est recompilé qu'avec `sudo decman --params aur-upgrade-devel`.
 - **Modules decman :** `apps` pour les applications communes, `amd` pour le microcode et les pilotes Vulkan radeon (64 et 32 bits pour Steam), partagé par les deux hôtes AMD. `multilib` est activé par archinstall (`mirror_config.optional_repositories`), donc decman ne gère pas `pacman.conf`.
 
-**Étape 3, chezmoi (27/09/2026).** Branche `arch-migration` de dotfiles, validée dans la VM (profil perso sur Arch) :
+**Étape 3, chezmoi (27/09/2026).** Validée dans la VM (profil perso sur Arch), vérifiée sur le laptop et le serveur du travail (`chezmoi diff`, puis `apply`), fusionnée dans `main` de dotfiles :
 - **`.chezmoi.toml.tmpl` :**
   - demande une seule fois `work` et `headless` ;
   - pose `encryption = "transparent"` ;

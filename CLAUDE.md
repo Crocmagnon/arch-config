@@ -57,7 +57,7 @@ Test in the VM bench (`vm/README.md`) before touching real hardware: `vm/state.s
 
 ## dotfiles (chezmoi) gotchas
 
-The chezmoi side lives in the `dotfiles` repo (branch `arch-migration`).
+The chezmoi side lives in the `dotfiles` repo (`main`).
 - **Templates run with `missingkey=error`:** use `get . "work"`, never `.work`. Machines that have not re-run `chezmoi init` lack the key.
 - **`{{-` also eats the newline before the tag, gluing headings together.** Put tags on their own line with `-}}` only.
 - **chezmoi skips only truly empty renders:** a lone `\n` still creates the file.
