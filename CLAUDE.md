@@ -51,7 +51,7 @@ Test in the VM bench (`vm/README.md`) before touching real hardware: `vm/state.s
 - **Declare the provider whenever pacman would ask which package provides a virtual dependency.** Otherwise real installs prompt, and the default can be wrong: for `tessdata`, the default is Afrikaans. Declared so far: `pipewire-jack`, `qt6-multimedia-ffmpeg`, `tesseract-data-eng`, `tesseract-data-fra`, `vulkan-radeon`, `lib32-vulkan-radeon`. After a VM run, list the prompts with `grep -a -A3 "providers available"` on the log.
 - **Flatpak needs two runs.** The decman flatpak plugin is probed at startup, before pacman installs `flatpak`, so the first run skips it with a warning.
 - **The autologin wallet is served by `ksecretd`** (KWallet 6), which owns `org.freedesktop.secrets` and is unlocked by PAM. Check it with the Secret Service `Locked` property of `/org/freedesktop/secrets/collection/kdewallet`. The legacy `org.kde.kwalletd6` name is a separate process that reports the wallet closed; whether apps using it re-prompt is still to be checked.
-- **ufw denies all incoming traffic.** In the VM, keep port 22 open, or you lock yourself out of the SSH that drives it.
+- **ufw denies all incoming traffic, SSH included.** The real machines run no SSH server. In the VM, chain `sudo ufw allow ssh` in the same command as the first real decman run: the running session survives (established connections pass), new ones do not (recovery: a TTY via `virsh send-key`).
 - **gpg-agent starts about 1 s before the Plasma session, without a display.** SSH requests carry no display, so pinentry needs `updatestartuptty`, run by a dotfiles XDG autostart entry and by every interactive fish. In VM tests, never run `updatestartuptty` from a display-less ssh command: it wipes the display.
 - **GnuPG stays in `~/.gnupg`.** gpg-agent is the SSH agent, and Arch does not export `SSH_AUTH_SOCK` for it. chezmoi handles that.
 
@@ -64,10 +64,6 @@ The chezmoi side lives in the `dotfiles` repo (`main`).
 - **Never template a file that already contains `{{`** (kitty.conf has 23 in its comments). Include a small templated file instead (`shell.conf`).
 - **Test renders without touching `$HOME`:** `nix shell nixpkgs#chezmoi --command chezmoi --config <tmp.toml> --source . --destination <tmp> execute-template` or `managed`. `--promptBool` matches the prompt *text*, not the key.
 - **Once dotfiles is unlocked, never print a rendered template that includes a secret.** Use `chezmoi apply` without `-v`, and `chezmoi status` for names only.
-
-## Before real hardware
-
-- Remove the temporary `ufw allow ssh` from `decman/desktop.py` (VM iterations only), and delete the rule on any machine that got it (`ufw delete allow ssh`).
 
 ## Working rules
 

@@ -66,7 +66,4 @@ class Desktop(Module):
         prg(["ufw", "default", "allow", "outgoing"])
         for proto in ("tcp", "udp"):
             prg(["ufw", "allow", f"1714:1764/{proto}", "comment", "KDE Connect"])
-        # TEMPORAIRE, le temps des itérations en VM (pilotage par SSH) : à retirer avant les
-        # vraies machines, qui n'ont pas de serveur SSH. Voir CLAUDE.md.
-        prg(["ufw", "allow", "ssh", "comment", "temporaire : VM de test"])
         prg(["ufw", "--force", "enable"])

@@ -349,14 +349,7 @@ Les secrets de srv-1 ne sont pas touchés.
    - la bibliothèque Steam, si tu ne veux pas la retélécharger.
 2. Lancer le script de re-chiffrement (§5) **avant** d'effacer la dernière machine NixOS qui contient ces secrets.
 
-**Installation**
-1. `archinstall --config-url <url>/user_configuration.json --creds <fichier local>`. Les `custom_commands` s'exécutent dans le chroot et font la bascule vers l'initramfs systemd **en une fois** :
-   1. HOOKS systemd dans `mkinitcpio.conf` ;
-   2. `/etc/crypttab.initramfs` généré avec `blkid` (racine, plus le swap sur L) ;
-   3. `mkinitcpio -P`.
-   
-   À valider dans la VM : que ces commandes tournent bien après l'installation du bootloader.
-2. Installer `decman` depuis l'AUR (`makepkg`), puis `sudo decman --source …/source.py --dry-run --debug`. Comparer avec `pacman -Qqe`, puis lancer le vrai run.
+**Installation** : la procédure est dans le [README](README.md#installer-une-machine) (archinstall rendu par `render.sh`, puis decman, puis chezmoi). Les `custom_commands` d'archinstall basculent vers l'initramfs systemd en une fois : `/etc/crypttab` avec `x-initrd.attach`, HOOKS dans `/etc/mkinitcpio.conf.d/10-hooks.conf`, puis `mkinitcpio -P`. Validé en VM : elles tournent après l'installation du bootloader.
 
 **Amorçage chezmoi** (depuis un TTY, avant la première connexion graphique)
 1. `chezmoi init <repo>`, sans `--apply` : les templates incluent des fichiers git-crypt.
