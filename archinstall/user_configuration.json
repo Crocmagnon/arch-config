@@ -1,0 +1,74 @@
+{
+  "archinstall-language": "English",
+  "hostname": "@HOSTNAME@",
+  "timezone": "Europe/Paris",
+  "ntp": true,
+  "locale_config": {
+    "kb_layout": "fr",
+    "sys_lang": "en_US.UTF-8",
+    "sys_enc": "UTF-8"
+  },
+  "kernels": ["linux"],
+  "packages": ["git", "base-devel"],
+  "network_config": {"type": "nm"},
+  "profile_config": {"profile": {"main": "Minimal", "details": []}},
+  "swap": {"enabled": true, "algorithm": "zstd"},
+  "bootloader_config": {
+    "bootloader": "Limine",
+    "uki": false,
+    "removable": false,
+    "plymouth": "bgrt"
+  },
+  "disk_config": {
+    "config_type": "default_layout",
+    "device_modifications": [
+      {
+        "device": "@DEVICE@",
+        "wipe": true,
+        "partitions": [
+          {
+            "obj_id": "8c2f4b1e-0a57-4d0b-9f3e-6d1c2a7b5e01",
+            "status": "create",
+            "type": "primary",
+            "start": {"value": 1, "unit": "MiB", "sector_size": {"value": 512, "unit": "B"}},
+            "size": {"value": 4, "unit": "GiB", "sector_size": {"value": 512, "unit": "B"}},
+            "fs_type": "fat32",
+            "mountpoint": "/boot",
+            "dev_path": null,
+            "mount_options": [],
+            "flags": ["boot", "esp"],
+            "btrfs": []
+          },
+          {
+            "obj_id": "3d9a6e72-5b18-4c4f-8a21-0e7f9b3c6d02",
+            "status": "create",
+            "type": "primary",
+            "start": {"value": 4097, "unit": "MiB", "sector_size": {"value": 512, "unit": "B"}},
+            "size": {"value": "@ROOT_MIB@", "unit": "MiB", "sector_size": {"value": 512, "unit": "B"}},
+            "fs_type": "btrfs",
+            "mountpoint": null,
+            "dev_path": null,
+            "mount_options": ["compress=zstd"],
+            "flags": [],
+            "btrfs": [
+              {"name": "@", "mountpoint": "/"},
+              {"name": "@home", "mountpoint": "/home"},
+              {"name": "@log", "mountpoint": "/var/log"},
+              {"name": "@pkg", "mountpoint": "/var/cache/pacman/pkg"},
+              {"name": "@swap", "mountpoint": "/swap"}
+            ]
+          }
+        ]
+      }
+    ],
+    "disk_encryption": {
+      "encryption_type": "luks",
+      "partitions": ["3d9a6e72-5b18-4c4f-8a21-0e7f9b3c6d02"],
+      "lvm_volumes": []
+    }
+  },
+  "custom_commands": [
+    "set -e\ndev=$(cryptsetup status root | awk '$1 == \"device:\" {print $2}')\necho \"root UUID=$(blkid -s UUID -o value \"$dev\") none luks,discard\" > /etc/crypttab.initramfs\nsed -i 's/^HOOKS=.*/HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block plymouth sd-encrypt filesystems fsck)/' /etc/mkinitcpio.conf\nmkinitcpio -P",
+    "set -e\n[ \"$(cat /etc/hostname)\" = framework-gab-amd ] || exit 0\nram=$(awk '/MemTotal/ {print int($2 / 1048576) + 1}' /proc/meminfo)\nbtrfs filesystem mkswapfile --size \"${ram}g\" --uuid clear /swap/swapfile\necho '/swap/swapfile none swap defaults 0 0' >> /etc/fstab"
+  ]
+}

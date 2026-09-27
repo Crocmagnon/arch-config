@@ -30,7 +30,7 @@ Cibles :
 |---|---|
 | nix sur les Arch | **Non.** Conséquences sous le tableau. |
 | Bootloader | **Limine** + `limine-snapper-sync` (AUR) + `snap-pac` : un snapshot avant et après chaque transaction pacman, démarrable depuis le menu. C'est l'équivalent des générations NixOS. |
-| Swap | **L** : partition swap LUKS dédiée, déclarée dans le layout d'archinstall. **D** : zram. |
+| Swap | zram sur L et D, plus sur **L** un **swapfile btrfs** (`@swap`, taille = RAM) pour l'hibernation, créé par un `custom_command` d'archinstall : pas d'étape manuelle. La partition swap LUKS dédiée a été écartée à l'étape 1. Le menu d'archinstall exclut le swap du chiffrement (`disk/encryption_menu.py:318`). En JSON, archinstall ferait `swapon` sur la partition brute (`installer.py:396`) et mettrait sa clé dans la racine chiffrée, donc elle serait inaccessible avant la racine. Avec le swapfile, il n'y a qu'un volume LUKS, et la reprise passe par `HibernateLocation`, sans `resume=` ni offset. |
 | Initramfs | **systemd** (`sd-encrypt`) sur L et D. Il sert au déverrouillage du wallet (cf. ligne suivante) et, sur L, à la reprise d'hibernation. La bascule depuis le `encrypt` qu'archinstall pose se fait une seule fois, dans les `custom_commands` d'archinstall (§7). |
 | Wallet | **Déverrouillé automatiquement à l'autologin** avec la passphrase LUKS, via la recette du Arch Wiki « KDE Wallet » : `pam_systemd_loadkey` plus un override `KeyringMode=inherit` du service de connexion. |
 | Clés GPG et SSH | **Déverrouillées par le wallet.** gpg-agent sert d'agent SSH partout (setup du travail). pinentry-qt enregistre la passphrase dans KWallet via le protocole Secret Service, qui la lui rend ensuite sans question. Détail et limites (laptop du travail) en §6. |
@@ -67,7 +67,7 @@ Cibles :
 | `--only` / `--skip` / `--no-hooks` | **Vrai.** Les valeurs sont des noms d'étapes. Un nom inconnu passé à `--skip` lève une `ValueError`. | [app.py L38-58, L239-256](https://github.com/kiviktnm/decman/blob/main/src/decman/app.py) |
 | Choix du module par hostname | **Pas d'aide intégrée.** La source est du Python, donc on branche sur `socket.gethostname()`. `--source` est mémorisé. | [app.py L132-171](https://github.com/kiviktnm/decman/blob/main/src/decman/app.py) |
 | `archinstall --config <url>` | **Faux.** Pour une URL, il faut `--config-url` (de même `--creds-url`). | [args.py L519-552](https://github.com/archlinux/archinstall/blob/master/archinstall/lib/args.py) |
-| archinstall : LUKS + btrfs | **Vrai.** Défaut `@ @home @log @pkg`. `btrfs_options.snapshot_config: Snapper` configure snapper pour `/` et `/home`. | [default_layouts.py L130-139](https://github.com/archlinux/archinstall/blob/master/archinstall/lib/disk/default_layouts.py), [installer.py L982-1005](https://github.com/archlinux/archinstall/blob/master/archinstall/lib/installer.py) |
+| archinstall : LUKS + btrfs | **Vrai**, mais **snapper ne se configure pas depuis un fichier JSON** (bug d'archinstall 4.4). `SubvolumeModification.parse_args` garde le nom `'@'` en chaîne, alors que `is_default_root()` le compare à `Path('@')`, donc `btrfs_options` est ignoré sans message. snapper passe dans le module decman `snapshots`. | [default_layouts.py L130-139](https://github.com/archlinux/archinstall/blob/master/archinstall/lib/disk/default_layouts.py), [installer.py L982-1005](https://github.com/archlinux/archinstall/blob/master/archinstall/lib/installer.py) |
 | (implicite) initramfs systemd | **Faux avec une passphrase simple.** archinstall pose le hook busybox `encrypt`, d'où la bascule en `custom_commands` (§7). | [installer.py L121-135, L838-884](https://github.com/archlinux/archinstall/blob/master/archinstall/lib/installer.py) |
 | Panther Lake « veut ≥ 7.1 » | **Faux comme exigence.** Framework annonce : minimum 6.19, recommandé 7.0+. Le `linux` de core est en 7.2.7. | [frame.work/laptop13pro?tab=linux](https://frame.work/laptop13pro?tab=linux), [archlinux.org linux](https://archlinux.org/packages/core/x86_64/linux/) |
 | `kwriteconfig6 --notify`, `--group` répété | **Vrai.** `--notify` ne recharge que les applications qui surveillent leur config (KConfigWatcher). | [kwriteconfig.cpp L24-96](https://invent.kde.org/frameworks/kconfig/-/blob/master/src/kreadconfig/kwriteconfig.cpp) |
@@ -87,7 +87,7 @@ Le Arch Wiki bloque les lectures automatiques. Les pages KDE Wallet, Snapper et 
 
 | Fonctionnalité (NixOS) | Hôte | Cible | Arch | Note |
 |---|---|---|---|---|
-| ext4 sur LUKS + swap LUKS | L+D | ai | — | btrfs `@ @home @log @pkg` sur LUKS, `compress=zstd`. L : plus une partition swap LUKS (plusieurs `obj_id` dans `disk_encryption.partitions`). D : zram. |
+| ext4 sur LUKS + swap LUKS | L+D | ai | — | Une seule partition LUKS avec btrfs `@ @home @log @pkg @swap`, `compress=zstd`, et un ESP de 4 Gio en `/boot` (noyaux des snapshots pour Limine). Taille de la racine calculée par `archinstall/render.sh`, car archinstall 4.4 n'accepte plus de pourcentage. |
 | Discards à travers LUKS | L+D | ai / man. | — | Option `discard` dans crypttab, ou `cryptsetup refresh --allow-discards --persistent` une fois. À vérifier dans la VM : archinstall le pose-t-il ? |
 | systemd-boot | L+D | ai + dm | `limine limine-snapper-sync snap-pac` | decman gère **`/etc/default/limine`** (ligne de commande du noyau), **jamais `limine.conf`**, que `limine-snapper-sync` réécrit. |
 | Paquets de base à protéger | L+D | dm | `base base-devel linux linux-firmware git sudo btrfs-progs snapper efibootmgr` + microcode + `decman` (AUR) | Sinon decman les retire. Comparer `pacman -Qqe` avec `--dry-run` avant le premier vrai run. |
@@ -358,7 +358,7 @@ Une couche à la fois, chacune validée dans une VM avant de passer à la suivan
 1. `base` : `--dry-run` comparé à `pacman -Qqe`, qui ne doit proposer de retirer aucun paquet utile ; puis le vrai run.
 2. `snapshots` : snap-pac et limine-snapper-sync, avec un démarrage sur un snapshot.
 3. `desktop` : Plasma, plasma-login-manager, l'autologin, le wallet ouvert à l'autologin, ufw.
-4. Modules d'hôte : la VM prend tour à tour le hostname `framework-gab-amd`, puis `desktop-gab`. L'hibernation se teste dans la VM.
+4. Modules d'hôte : la VM prend tour à tour le hostname `framework-gab-amd`, puis `desktop-gab`. L'hibernation ne se teste **pas** dans la VM : la reprise redémarre pendant la restauration de la mémoire (voir `vm/README.md`). Elle se teste à l'étape 4.
 
 Sauvegarde de l'état **post-decman**.
 
