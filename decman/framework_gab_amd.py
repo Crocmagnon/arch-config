@@ -30,8 +30,11 @@ class FrameworkGabAmd(Module):
         return {
             # Veille, puis hibernation au bout d'une heure (déclenchée par powerdevil, SleepMode=3).
             # Reprise sans resume= : l'initramfs systemd lit la variable EFI HibernateLocation.
+            # HibernateMode=shutdown : écrire l'image puis s'éteindre, sans entrer en ACPI S4. En S4,
+            # ce laptop se rallume tout seul au bout de quelques secondes (constaté sous NixOS, puis
+            # sous Arch le 28/09/2026).
             "/etc/systemd/sleep.conf.d/hibernate.conf": File(
-                content="[Sleep]\nHibernateDelaySec=60min\n"
+                content="[Sleep]\nHibernateDelaySec=60min\nHibernateMode=shutdown\n"
             ),
             # Après une hibernation de plus de 5 min, la passphrase LUKS vient d'être saisie : lever
             # le verrouillage de Plasma. Les hooks de veille ne sont lus que dans /usr/lib.
@@ -41,7 +44,7 @@ class FrameworkGabAmd(Module):
             # Clavier et souris derrière le KVM : réveil par USB (le KVM rattache le hub à chaque
             # bascule, un réglage ponctuel ne survivrait pas).
             "/etc/udev/rules.d/90-usb-wakeup.rules": File(
-                content='ACTION=="add", SUBSYSTEM=="usb", DRIVER=="usb", ATTR{power/wakeup}="enabled"\n'
+                content='ACTION=="add", SUBSYSTEM=="usb", DRIVER=="usb", TEST=="power/wakeup", ATTR{power/wakeup}="enabled"\n'
             ),
             # Carte d'extension Ethernet Framework (Realtek) : autosuspend (nixos-hardware).
             "/etc/udev/rules.d/90-framework-ethernet.rules": File(
