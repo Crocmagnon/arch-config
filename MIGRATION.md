@@ -54,6 +54,38 @@ Cibles :
 - **OpenSCAD :** `openscad-git` (AUR), l'équivalent de `openscad-unstable`. Il n'existe rien de précompilé et récent : les dépôts officiels, Flathub et AUR `-appimage` sont tous en 2021.01. Il n'est recompilé qu'avec `sudo decman --params aur-upgrade-devel`.
 - **Modules decman :** `apps` pour les applications communes, `amd` pour le microcode et les pilotes Vulkan radeon (64 et 32 bits pour Steam), partagé par les deux hôtes AMD. `multilib` est activé par archinstall (`mirror_config.optional_repositories`), donc decman ne gère pas `pacman.conf`.
 
+**Étape 3, chezmoi (27/09/2026).** Branche `arch-migration` de dotfiles, validée dans la VM (profil perso sur Arch) :
+- **`.chezmoi.toml.tmpl` :**
+  - demande une seule fois `work` et `headless` ;
+  - pose `encryption = "transparent"` ;
+  - recopie `sourceDir`, `shell_path`, `brew` et `local_git_crypt` s'ils existent.
+- **`.chezmoiignore` templaté :**
+  - réservé au travail : hôtes, identifiants, fonctions k8s et bastion, MCP Jira et Stash ;
+  - réservé au perso : `go/env`, token HA, avatar ;
+  - réservé au bureau : polices, `environment.d`.
+- **Bascule clair/sombre** (portée de `theme-auto.nix`) :
+  - `conf.d/theme-auto.fish` (fish ≥ 4.3) pour starship (deux fichiers générés depuis `.chezmoitemplates/starship.toml`), eza, helix (`create_catppuccin.toml` + SIGUSR1) et fzf ;
+  - bat en `--theme=auto` ;
+  - kitty et herdr en `auto_switch`, Claude en `theme auto` partout.
+  - Validé : Plasma sombre → kitty → herdr → fish → helix en mocha. Le « cran de retard » de herdr lors d'une bascule à chaud est un bug amont connu, qui existait déjà sous NixOS.
+- **Chemins en dur `/home/gaugendr` retirés :**
+  - kitty et herdr passent par `lookPath "fish"` (kitty.conf reste statique et inclut un `shell.conf` templaté) ;
+  - Claude passe par `.chezmoi.homeDir`.
+- **Travail et perso :**
+  - git : `main` ou `master`, git-town au travail, `nvimdiff` supprimé ;
+  - SSH : hôtes perso ;
+  - token GitHub : `GITHUB_TOKEN` au travail, `GITHUB_API_TOKEN` en lecture seule en perso ;
+  - mise : outils du travail, ou Rust, Lua et Terraform en perso ;
+  - Claude : `settings.json` et règles de workflow. Le rendu travail est identique à `main`.
+- **Arch seulement** :
+  - `pinentry-qt` ;
+  - `environment.d` (`SSH_AUTH_SOCK`, `PINENTRY_KDE_USE_WALLET`) ;
+  - lien activant `plasma-krunner.service`.
+- **Plasma :** `.chezmoidata/plasma.yaml`, appliqué par `run_onchange_after_plasma.sh.tmpl` (kwriteconfig6 ou 5) ; powerdevil seulement sur le laptop.
+- **Serveur MCP Home Assistant :** `run_onchange_` avec `claude mcp add-json` ; le token reste dans `~/.config/ha-mcp/token`.
+- **Cache de bat :** reconstruit par `postinstall` dans mise, et par un `run_onchange_` quand les thèmes changent.
+- **Secrets :** les polices et les tokens sont re-chiffrés par `scripts/agenix-to-dotfiles.sh`, lancé par l'utilisateur.
+
 **Conséquences de l'absence de nix :**
 - **srv-1 se déploie depuis srv-1** (`nixos-rebuild switch --flake .#srv-1` dans un clone). `agenix -e` aussi : il faut que ton identité y soit présente. La tâche `mise run srv-1` est à adapter, mais je ne touche pas à la config du serveur sans ton feu vert.
 - **Hook pre-commit `nixfmt`** de nixos-config (`language: system`). Il exige `nixfmt` sur le PATH, et le paquet n'existe pas dans les dépôts officiels. Pistes : un binaire publié via mise (à vérifier), ou des commits faits depuis srv-1.

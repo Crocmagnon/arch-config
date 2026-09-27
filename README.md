@@ -13,7 +13,7 @@ Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config,
 | Paquets, fichiers `/etc`, unités systemd, snapshots | [decman](https://github.com/kiviktnm/decman) | `decman/` |
 | Fichiers utilisateur | chezmoi | dépôt dotfiles |
 
-> **État (27/09/2026).** Migration depuis NixOS en cours. La partie système est validée dans la VM de test, de bout en bout sur une installation neuve (profil laptop) : archinstall, puis tous les modules decman en deux runs (le second pour Flatpak), jusqu'à la session Plasma en autologin avec le wallet ouvert. Restent à faire : chezmoi, puis le vrai matériel (hibernation, empreinte, KVM). Le plan et les décisions sont dans [MIGRATION.md](MIGRATION.md).
+> **État (27/09/2026).** Migration depuis NixOS en cours. La partie système est validée dans la VM de test, de bout en bout sur une installation neuve (profil laptop) : archinstall, puis tous les modules decman en deux runs (le second pour Flatpak), jusqu'à la session Plasma en autologin avec le wallet ouvert. chezmoi (dépôt dotfiles, branche `arch-migration`) est validé dans la même VM : thème clair/sombre automatique, polices, réglages Plasma, `SSH_AUTH_SOCK` de session, serveur MCP. Restent à faire : le déverrouillage GPG et SSH par le wallet, la vérification des machines du travail (`chezmoi diff`), puis le vrai matériel (hibernation, empreinte, KVM). Le plan et les décisions sont dans [MIGRATION.md](MIGRATION.md).
 
 ## Installer une machine
 
@@ -37,6 +37,14 @@ Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config,
    sudo decman --source /chemin/vers/arch-config/decman/source.py
    ```
    Le premier run n'installe pas les Flatpak : le plugin Flatpak de decman est chargé au démarrage, avant que pacman n'installe `flatpak`. Un second `sudo decman` s'en charge. Le `--dry-run` doit n'enlever aucun paquet utile. Comparer sa sortie avec `pacman -Qqe`. Le chemin de la source n'est mémorisé qu'au premier vrai run : ce run-là prend donc aussi `--source`, et les suivants s'en passent.
+
+6. Appliquer les dotfiles depuis un TTY, avant la première session graphique (les raccourcis Plasma ne sont relus qu'à la connexion) :
+   ```sh
+   chezmoi init <dépôt dotfiles>          # sans --apply : les templates lisent des fichiers git-crypt
+   cd ~/.local/share/chezmoi && git-crypt unlock /tmp/gc.key && shred -u /tmp/gc.key
+   chezmoi init                           # répondre : travail non, serveur non
+   chezmoi apply && fish -lc 'mise install'
+   ```
 
 Les étapes manuelles (sauvegardes, secrets, comptes) sont listées dans [MIGRATION.md §7](MIGRATION.md#7-étapes).
 

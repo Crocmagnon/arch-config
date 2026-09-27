@@ -54,6 +54,16 @@ Test in the VM bench (`vm/README.md`) before touching real hardware: `vm/state.s
 - **ufw denies all incoming traffic.** In the VM, keep port 22 open, or you lock yourself out of the SSH that drives it.
 - **GnuPG stays in `~/.gnupg`.** gpg-agent is the SSH agent, and Arch does not export `SSH_AUTH_SOCK` for it. chezmoi handles that.
 
+## dotfiles (chezmoi) gotchas
+
+The chezmoi side lives in the `dotfiles` repo (branch `arch-migration`).
+- **Templates run with `missingkey=error`:** use `get . "work"`, never `.work`. Machines that have not re-run `chezmoi init` lack the key.
+- **`{{-` also eats the newline before the tag, gluing headings together.** Put tags on their own line with `-}}` only.
+- **chezmoi skips only truly empty renders:** a lone `\n` still creates the file.
+- **Never template a file that already contains `{{`** (kitty.conf has 23 in its comments). Include a small templated file instead (`shell.conf`).
+- **Test renders without touching `$HOME`:** `nix shell nixpkgs#chezmoi --command chezmoi --config <tmp.toml> --source . --destination <tmp> execute-template` or `managed`. `--promptBool` matches the prompt *text*, not the key.
+- **Once dotfiles is unlocked, never print a rendered template that includes a secret.** Use `chezmoi apply` without `-v`, and `chezmoi status` for names only.
+
 ## Before real hardware
 
 - Remove the temporary `ufw allow ssh` from `decman/desktop.py` (VM iterations only), and delete the rule on any machine that got it (`ufw delete allow ssh`).
