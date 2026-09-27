@@ -11,6 +11,7 @@
   "kernels": ["linux"],
   "packages": ["git", "base-devel"],
   "network_config": {"type": "nm"},
+  "mirror_config": {"optional_repositories": ["multilib"]},
   "profile_config": {"profile": {"main": "Minimal", "details": []}},
   "swap": {"enabled": true, "algorithm": "zstd"},
   "bootloader_config": {

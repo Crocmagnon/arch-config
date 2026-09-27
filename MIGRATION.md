@@ -48,6 +48,12 @@ Cibles :
 | Secrets agenix du desktop | Re-chiffrés en git-crypt par un script que tu relis et que tu lances toi-même (phase 3, §5). |
 | himalaya | Abandonné. Thunderbird : on restaure le profil. |
 
+**Tri des applications (27/09/2026).**
+- **Retirés :** esphome, zed, VS Code, solvespace.
+- **Outils Lua, Rust et Terraform** (luajit, luarocks, luacheck, busted, stylua, lua-language-server ; rustup, cargo-watch, cargo-audit, cargo-binstall ; terraform-ls) : ils passent par **mise**, dans la config chezmoi de l'étape 3. `clang` reste dans pacman.
+- **OpenSCAD :** `openscad-git` (AUR), l'équivalent de `openscad-unstable`. Il n'existe rien de précompilé et récent : les dépôts officiels, Flathub et AUR `-appimage` sont tous en 2021.01. Il n'est recompilé qu'avec `sudo decman --params aur-upgrade-devel`.
+- **Modules decman :** `apps` pour les applications communes, `amd` pour le microcode et les pilotes Vulkan radeon (64 et 32 bits pour Steam), partagé par les deux hôtes AMD. `multilib` est activé par archinstall (`mirror_config.optional_repositories`), donc decman ne gère pas `pacman.conf`.
+
 **Conséquences de l'absence de nix :**
 - **srv-1 se déploie depuis srv-1** (`nixos-rebuild switch --flake .#srv-1` dans un clone). `agenix -e` aussi : il faut que ton identité y soit présente. La tâche `mise run srv-1` est à adapter, mais je ne touche pas à la config du serveur sans ton feu vert.
 - **Hook pre-commit `nixfmt`** de nixos-config (`language: system`). Il exige `nixfmt` sur le PATH, et le paquet n'existe pas dans les dépôts officiels. Pistes : un binaire publié via mise (à vérifier), ou des commits faits depuis srv-1.

@@ -46,6 +46,9 @@ class Base(Module):
             ),
             "/etc/locale.gen": File(source_file="./files/base/locale.gen"),
             "/etc/locale.conf": File(source_file="./files/base/locale.conf"),
+            # makepkg compile sur un seul cœur par défaut (MAKEFLAGS commenté). makechrootpkg, qui
+            # sert aux builds AUR de decman, reprend ce MAKEFLAGS dans son chroot.
+            "/etc/makepkg.conf.d/parallel.conf": File(content='MAKEFLAGS="-j$(nproc)"\n'),
         }
 
     # Aussi appelé au premier run, avec on_enable.

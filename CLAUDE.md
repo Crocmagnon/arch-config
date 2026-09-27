@@ -46,6 +46,8 @@ Test in the VM bench (`vm/README.md`) before touching real hardware: `vm/state.s
   - `custom_commands` run after the bootloader and before `genfstab`.
 - **systemd-sleep hooks go in `/usr/lib/systemd/system-sleep/`.** `/etc/systemd/system-sleep/` only works on NixOS.
 - **Arch groups:** serial ports are `uucp`, not `dialout`, and libvirt is `libvirt`, not `libvirtd`.
+- **AUR builds run as `builduser`** (a system user). PGP keys for signed sources are received into its keyring by `GPGReceiver` in `source.py`, with one comment per key naming the package that needs it. The default `nobody` has no keyring, so any signed source fails.
+- **Never declare a package that another declared AUR package already pulls in** (for example `nrf-udev`, a dependency of `nrfconnect-appimage`). The AUR step installs it as a dependency, and every later run tries to install it again.
 - **Flatpak needs two runs.** The decman flatpak plugin is probed at startup, before pacman installs `flatpak`, so the first run skips it with a warning.
 - **The autologin wallet is served by `ksecretd`** (KWallet 6), which owns `org.freedesktop.secrets` and is unlocked by PAM. Check it with the Secret Service `Locked` property of `/org/freedesktop/secrets/collection/kdewallet`. The legacy `org.kde.kwalletd6` name is a separate process that reports the wallet closed; whether apps using it re-prompt is still to be checked.
 - **ufw denies all incoming traffic.** In the VM, keep port 22 open, or you lock yourself out of the SSH that drives it.

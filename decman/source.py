@@ -1,11 +1,15 @@
 # Source decman : sudo decman --source /chemin/vers/decman/source.py
 # Les modules communs d'abord, puis ce qui dépend de l'hôte (choisi par hostname).
+import os
 import socket
 
 import decman
-from decman.extras.users import UserManager
+from decman.extras.gpg import GPGReceiver
+from decman.extras.users import User, UserManager
 
 from base import USER, Base
+from amd import Amd
+from apps import Apps
 from boot import Boot
 from desktop import Desktop
 
@@ -28,4 +32,17 @@ users = UserManager()
 for group in ("docker", "uucp", "input"):
     users.add_user_to_group(USER, group)
 
-decman.modules += [Base(), Boot(KERNEL_PARAMS[host]), Desktop(), users]
+# Builds AUR : un utilisateur dédié, dont le trousseau reçoit les clés des sources signées
+# (configuration recommandée par la doc AUR de decman). nobody, l'utilisateur par défaut, n'a
+# pas de trousseau : toute source signée échoue.
+BUILD_HOME = "/var/lib/builduser"
+users.add_user(User(username="builduser", home=BUILD_HOME, system=True))
+os.environ["GNUPGHOME"] = f"{BUILD_HOME}/gnupg"
+decman.aur.makepkg_user = "builduser"
+keys = GPGReceiver()
+keys.receive_key(  # libudev0-shim, dépendance de jlink-software-and-documentation (nRF Connect)
+    user="builduser", gpg_home=f"{BUILD_HOME}/gnupg",
+    fingerprint="8703B6700E7EE06D7A39B8D6EDAE37B02CEB490D", keyserver="hkps://keyserver.ubuntu.com",
+)
+
+decman.modules += [Base(), Boot(KERNEL_PARAMS[host]), Desktop(), Apps(), Amd(), users, keys]

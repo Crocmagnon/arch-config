@@ -13,7 +13,7 @@ Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config,
 | Paquets, fichiers `/etc`, unités systemd, snapshots | [decman](https://github.com/kiviktnm/decman) | `decman/` |
 | Fichiers utilisateur | chezmoi | dépôt dotfiles |
 
-> **État (27/09/2026).** Migration depuis NixOS en cours. Validés dans la VM de test, de bout en bout sur une installation neuve : archinstall, puis les modules decman `base` et `boot` en un seul run, jusqu'au démarrage sur un snapshot ; puis le module `desktop` (Plasma en autologin, wallet ouvert par la passphrase LUKS, ufw, Flatpak). Restent à faire : le module `apps`, les modules d'hôte, puis chezmoi. Le plan et les décisions sont dans [MIGRATION.md](MIGRATION.md).
+> **État (27/09/2026).** Migration depuis NixOS en cours. Validés dans la VM de test, de bout en bout sur une installation neuve : archinstall, puis les modules decman `base` et `boot` en un seul run, jusqu'au démarrage sur un snapshot ; puis les modules `desktop` (Plasma en autologin, wallet ouvert par la passphrase LUKS, ufw, Flatpak), `apps` et `amd`. Restent à faire : les modules d'hôte (laptop, desktop), puis chezmoi. Le plan et les décisions sont dans [MIGRATION.md](MIGRATION.md).
 
 ## Installer une machine
 
@@ -45,7 +45,7 @@ Les étapes manuelles (sauvegardes, secrets, comptes) sont listées dans [MIGRAT
 **archinstall** (`archinstall/user_configuration.json`, rendu par `render.sh`) :
 - une ESP de 4 Gio montée sur `/boot` ;
 - une partition LUKS2 avec btrfs, sous-volumes `@ @home @log @pkg @swap`, compression zstd ;
-- Limine, plymouth, zram, NetworkManager, clavier `fr`, fuseau Europe/Paris.
+- Limine, plymouth, zram, NetworkManager, le dépôt `multilib` (pour Steam), clavier `fr`, fuseau Europe/Paris.
 
 Ses `custom_commands` font deux choses :
 - **initramfs systemd.** archinstall pose le hook busybox `encrypt`. Les commandes le remplacent par `sd-encrypt` via `/etc/mkinitcpio.conf.d/10-hooks.conf`, et déclarent la racine dans `/etc/crypttab` avec `x-initrd.attach`. C'est nécessaire à la reprise d'hibernation et au déverrouillage du wallet.
@@ -65,6 +65,10 @@ Ses `custom_commands` font deux choses :
   - Le wallet KDE ouvert à l'autologin avec la passphrase LUKS : `pam_systemd_loadkey` dans une copie de `plasmalogin-autologin`, et `KeyringMode=inherit` sur `plasmalogin.service`.
   - Audio, Bluetooth, impression, Docker, Tailscale, iPhone.
   - ufw (entrée refusée, sauf KDE Connect), Flatpak (PrusaSlicer).
+- `apps.py` : les applications (Firefox, Chromium, Signal, Thunderbird, FreeCAD, LibreOffice, calibre, Steam, openscad-git, suite Nordic nRF…) et les outils en ligne de commande qui ne viennent pas de mise.
+- `amd.py` : le microcode et les pilotes Vulkan pour les machines AMD.
+- Les paquets AUR se compilent sous l'utilisateur système `builduser`. Les clés PGP des sources signées lui sont fournies par `source.py`.
+- `/etc/makepkg.conf.d/parallel.conf` fait compiler sur tous les cœurs (makepkg n'en utilise qu'un par défaut).
 - `source.py` ajoute aussi l'utilisateur aux groupes `docker`, `uucp` (ports série) et `input`.
 
 ## Revenir en arrière
