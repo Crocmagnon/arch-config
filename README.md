@@ -31,8 +31,9 @@ Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config,
    ```sh
    archinstall --config config.json --creds creds.json --silent
    ```
-5. Installer decman depuis l'AUR, à la main pour cette seule fois (`makepkg`), puis :
+5. Se connecter en `gaugendre` sur un TTY, se connecter au réseau (`nmcli device wifi connect <SSID> --ask`), cloner ce dépôt, puis installer decman depuis l'AUR, à la main pour cette seule fois :
    ```sh
+   cd /tmp && git clone https://aur.archlinux.org/decman.git && cd decman && makepkg -si --nocheck
    sudo decman --source /chemin/vers/arch-config/decman/source.py --dry-run --debug
    sudo decman --source /chemin/vers/arch-config/decman/source.py
    ```
