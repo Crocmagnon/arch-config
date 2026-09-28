@@ -36,7 +36,7 @@ Test in the VM bench (`vm/README.md`) before touching real hardware: `vm/state.s
 - **Execution order is `pacman, aur, files, systemd`.** Writing a file that a not-yet-installed package owns would make pacman fail.
 - **decman enables units, never starts them.** It only touches units that are, or were, declared.
 - **`on_change` also runs on the first run, together with `on_enable`.** Do not repeat work in both.
-- **Never manage `/boot/limine.conf`.** limine-mkinitcpio-hook generates it from `/etc/kernel/cmdline`, and limine-snapper-sync adds the snapshot entries. Its checksum is enrolled in the Limine binary, so hand edits break boot.
+- **Never manage `/boot/limine.conf`.** limine-mkinitcpio-hook generates it from `/etc/kernel/cmdline`, and limine-snapper-sync adds the snapshot entries. `limine-update` rewrites it, keeping global options, so add a global option with an idempotent edit in a hook (see `term_font_scale` in `framework_gab_amd.py`), never a `File`. Its checksum is not enrolled in the Limine binary: that only happens with `ENABLE_ENROLL_LIMINE_CONFIG=yes`, which is off by default (`enroll_config()` in `/usr/lib/limine/limine-common-functions`).
 - **Initramfs hooks live in `/etc/mkinitcpio.conf.d/10-hooks.conf`.** archinstall writes it, and `boot.py` takes it over and adds `sd-btrfs-overlayfs`, which is required to boot a read-only snapshot and only exists once the AUR package is installed.
 - **The LUKS root is in `/etc/crypttab` with `x-initrd.attach`.** `crypttab.initramfs` is deprecated in mkinitcpio 42. UUIDs are per install and never go in git.
 - **archinstall 4.4 bugs and limits:**

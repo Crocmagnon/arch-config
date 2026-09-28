@@ -82,7 +82,8 @@ Ses `custom_commands` font deux choses :
   - l'hibernation (veille, puis hibernation au bout d'une heure) et la levée du verrouillage de Plasma après une hibernation de plus de 5 min ;
   - l'empreinte digitale au verrouillage de l'écran, les profils d'énergie ;
   - le réveil par le clavier derrière le KVM, la carte Ethernet Framework, la blacklist audio du BIOS ;
-  - les outils de mesure de la batterie.
+  - les outils de mesure de la batterie ;
+  - pour l'écran dense : la police de console Terminus 22 px et la police du menu Limine doublée.
 - `source.py` associe chaque hôte à ses paramètres noyau et à ses modules. desktop-gab n'a pas de module propre : juste `acpi_osi` pour la veille. Il ajoute aussi l'utilisateur aux groupes `docker`, `uucp` (ports série), `input` et `libvirt`.
 
 ## Revenir en arrière

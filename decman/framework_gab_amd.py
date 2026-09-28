@@ -1,5 +1,5 @@
 # Framework 13 AMD (Ryzen AI 300) : hibernation, empreinte, KVM, cartes d'extension.
-from decman import File, Module
+from decman import File, Module, prg
 from decman.plugins import aur, pacman, systemd
 
 FILES = "./files/framework-gab-amd"
@@ -16,6 +16,7 @@ class FrameworkGabAmd(Module):
             "power-profiles-daemon", "iio-sensor-proxy",  # profils d'énergie, luminosité auto
             "framework-system",  # framework_tool
             "powertop", "acpi",  # mesure de la batterie
+            "terminus-font",  # police de console, voir vconsole.conf
         }
 
     @aur.packages
@@ -54,4 +55,15 @@ class FrameworkGabAmd(Module):
             "/etc/modprobe.d/framework-acp.conf": File(
                 content="blacklist snd_acp70\nblacklist snd_acp_pci\n"
             ),
+            # Écran dense (2256x1504) : police de console de 22 px pour les TTY et les logs de
+            # démarrage. Le hook sd-vconsole la copie dans l'initramfs (d'où limine-update plus bas).
+            "/etc/vconsole.conf": File(content="KEYMAP=fr\nFONT=ter-122n\n"),
         }
+
+    # Aussi appelé au premier run.
+    def on_change(self, store) -> None:
+        # Menu Limine lisible : police doublée. limine-update relit limine.conf et garde ses options
+        # globales (vérifié le 28/09/2026), il suffit donc de l'ajouter une fois.
+        prg(["sh", "-c", "grep -q '^term_font_scale:' /boot/limine.conf"
+             " || sed -i '/^timeout:/i term_font_scale: 2x2' /boot/limine.conf"])
+        prg(["limine-update"])  # régénère l'initramfs, pour la police de console
