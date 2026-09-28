@@ -13,7 +13,7 @@ Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config,
 | Paquets, fichiers `/etc`, unités systemd, snapshots | [decman](https://github.com/kiviktnm/decman) | `decman/` |
 | Fichiers utilisateur | chezmoi | dépôt dotfiles |
 
-> **État (27/09/2026).** Migration depuis NixOS en cours. La partie système est validée dans la VM de test, de bout en bout sur une installation neuve (profil laptop) : archinstall, puis tous les modules decman en deux runs (le second pour Flatpak), jusqu'à la session Plasma en autologin avec le wallet ouvert. chezmoi (dépôt dotfiles, fusionné dans `main` le 27/09/2026) est validé dans la même VM : thème clair/sombre automatique, polices, réglages Plasma, `SSH_AUTH_SOCK` de session, serveur MCP. Le déverrouillage GPG et SSH par le wallet est validé, y compris pour une requête SSH sans terminal ouvert. Vérifié et appliqué sur les machines du travail. Reste à faire : le vrai matériel (hibernation, empreinte, KVM). Le plan et les décisions sont dans [MIGRATION.md](MIGRATION.md).
+> **État (28/09/2026).** Le laptop `framework-gab-amd` tourne sous Arch avec cette config, vérifiée sur le matériel : hibernation, empreinte, réveil par le KVM, exit node Tailscale. Chaque machine perso a ses propres clés SSH et GPG. Prochaine étape : le desktop `desktop-gab` (sa config a été validée en VM ; restent l'écran DisplayPort à l'invite LUKS et la veille). srv-1 reste sous NixOS et se déploie depuis lui-même (`mise run srv-1` dans nixos-config). Le plan et les décisions sont dans [MIGRATION.md](MIGRATION.md).
 
 ## Installer une machine
 

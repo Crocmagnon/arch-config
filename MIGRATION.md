@@ -33,6 +33,7 @@ Cibles :
 | Swap | zram sur L et D, plus sur **L** un **swapfile btrfs** (`@swap`, taille = RAM) pour l'hibernation, créé par un `custom_command` d'archinstall : pas d'étape manuelle. La partition swap LUKS dédiée a été écartée à l'étape 1. Le menu d'archinstall exclut le swap du chiffrement (`disk/encryption_menu.py:318`). En JSON, archinstall ferait `swapon` sur la partition brute (`installer.py:396`) et mettrait sa clé dans la racine chiffrée, donc elle serait inaccessible avant la racine. Avec le swapfile, il n'y a qu'un volume LUKS, et la reprise passe par `HibernateLocation`, sans `resume=` ni offset. |
 | Initramfs | **systemd** (`sd-encrypt`) sur L et D. Il sert au déverrouillage du wallet (cf. ligne suivante) et, sur L, à la reprise d'hibernation. La bascule depuis le `encrypt` qu'archinstall pose se fait une seule fois, dans les `custom_commands` d'archinstall (§7). |
 | Wallet | **Déverrouillé automatiquement à l'autologin** avec la passphrase LUKS, via la recette du Arch Wiki « KDE Wallet » : `pam_systemd_loadkey` plus un override `KeyringMode=inherit` du service de connexion. |
+| Clés GPG et SSH (création) | **Une paire par machine perso, créée sur place** (28/09/2026) : clé SSH ed25519, clé GPG ed25519 [SC] + sous-clé cv25519 [E], expiration 2 ans. Rien n'est copié d'une machine à l'autre. Les machines du travail gardent leurs clés (`default-key` seulement sous `work` dans `gpg.conf`). Procédure en §7. |
 | Clés GPG et SSH | **Déverrouillées par le wallet.** gpg-agent sert d'agent SSH partout (setup du travail). pinentry-qt enregistre la passphrase dans KWallet via le protocole Secret Service, qui la lui rend ensuite sans question. Détail et limites (laptop du travail) en §6. |
 | Gestionnaire de connexion | **plasma-login-manager** (dépendance de `plasma-meta` 6.7), pas SDDM. |
 | Pare-feu | **ufw géré par decman** (règles dans `/etc/ufw/`, `ENABLED=yes`, `ufw.service`). `plasma-firewall` est installé par `plasma-meta`, mais on ne s'en sert pas : decman écraserait ses modifications. |
@@ -339,13 +340,11 @@ Les secrets de srv-1 ne sont pas touchés.
 
 **Avant d'effacer (par machine)**
 1. Sauvegarder :
-   - `~/.config/agenix/identity.txt` (indispensable, y compris pour srv-1) ;
-   - `~/.local/share/gnupg` ;
-   - `~/.ssh` ;
-   - le profil Thunderbird ;
-   - `~/Projects` ;
-   - les VM (D) ;
-   - la bibliothèque Steam, si tu ne veux pas la retélécharger.
+   - `~/.config/agenix/identity.txt` (indispensable, y compris pour srv-1) : dans Bitwarden ;
+   - le profil Thunderbird (L) ;
+   - pousser tous les dépôts de `~/Projects`.
+
+   Rien d'autre : chaque machine recrée ses clés SSH et GPG (§6), et les VM, la bibliothèque Steam et les dossiers personnels ne sont pas gardés.
 2. Lancer le script de re-chiffrement (§5) **avant** d'effacer la dernière machine NixOS qui contient ces secrets.
 
 **Installation** : la procédure est dans le [README](README.md#installer-une-machine) (archinstall rendu par `render.sh`, puis decman, puis chezmoi). Les `custom_commands` d'archinstall basculent vers l'initramfs systemd en une fois : `/etc/crypttab` avec `x-initrd.attach`, HOOKS dans `/etc/mkinitcpio.conf.d/10-hooks.conf`, puis `mkinitcpio -P`. Validé en VM : elles tournent après l'installation du bootloader.
@@ -354,7 +353,13 @@ Les secrets de srv-1 ne sont pas touchés.
 1. `chezmoi init <repo>`, sans `--apply` : les templates incluent des fichiers git-crypt.
 2. La clé git-crypt vient du gestionnaire de mots de passe. `git-crypt export-key` produit un binaire : s'il est stocké en base64, `base64 -d > /tmp/gc.key`. Puis `git-crypt unlock /tmp/gc.key` dans `~/.local/share/chezmoi`, et `shred -u /tmp/gc.key`.
 3. `chezmoi apply`, puis `mise install`, `rustup default stable`, `fisher update`.
-4. Restaurer `~/.gnupg`, puis `ssh-add ~/.ssh/id_ed25519`. À la première demande de passphrase, cocher « enregistrer ».
+4. Après le premier démarrage dans Plasma, dans un terminal (pinentry-qt et le wallet ne sont là qu'en session graphique) :
+   ```sh
+   ssh-keygen -t ed25519 -C "gaugendre@$(hostname)"
+   ssh-add ~/.ssh/id_ed25519
+   gpg --quick-generate-key "Gabriel Augendre <gabriel@augendre.info>" default default 2y
+   ```
+   Cocher « enregistrer dans le gestionnaire de mots de passe » à chaque pinentry. Sauvegarder la clé GPG secrète (`gpg --armor --export-secret-keys`) et son certificat de révocation (`~/.gnupg/openpgp-revocs.d/`) dans Bitwarden. Publier les deux clés publiques sur Codeberg et GitHub, et la clé SSH dans `modules/nixos/common/users.nix` (nixos-config, déployé sur srv-1) et sur `hass`. Passer ensuite les remotes de dotfiles et arch-config en SSH.
 
 **Comptes et services**
 - `tailscale up` ;
@@ -365,7 +370,7 @@ Les secrets de srv-1 ne sont pas touchés.
 - `fprintd-enroll` (L) ;
 - `fwupdmgr refresh && fwupdmgr update` ;
 - `flatpak remote-add flathub-beta …` puis installer PrusaSlicer `//beta` ;
-- Rotatrix : rien à faire, `chezmoi apply` l'installe. Supprimer l'ancien addon FreeCAD.
+- Rotatrix : rien à faire, `chezmoi apply` l'installe (l'appli pose sa règle udev au premier lancement).
 
 **Revenir à un snapshot.** Dans le menu Limine, ouvrir Snapshots, choisir le snapshot, puis son entrée `linux`. Le système démarre sur le snapshot avec un overlay en écriture (les changements sont perdus au redémarrage). `systemd-remount-fs.service` y échoue, et c'est attendu : il essaie de remonter un overlay avec les options btrfs de fstab. Pour rendre le retour définitif : `limine-snapper-restore` depuis ce démarrage (méthode `replace`, la valeur par défaut).
 
