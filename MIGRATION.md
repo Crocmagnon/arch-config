@@ -172,7 +172,7 @@ Le Arch Wiki bloque les lectures automatiques. Les pages KDE Wallet, Snapper et 
 | Pare-feu | L+D | dm | `ufw` + règles (KDE Connect 1714-1764/tcp+udp) | |
 | iPhone | L+D | dm | `usbmuxd libimobiledevice ifuse` | |
 | nRF Connect | L+D | dm (AUR) | `nrfconnect-appimage nrfutil nrf-udev jlink-software-and-documentation` | |
-| Rotatrix | L+D | man. + dm | AppImage dans `~/Applications`, `fuse2`, `.desktop` d'autostart (cz) | D'abord laisser l'appli installer sa propre règle udev, ce qu'elle ne pouvait pas faire sur NixOS. À défaut, un seul fichier `/etc/udev/rules.d/70-rotatrix.rules` (hidraw + uinput en `TAG+="uaccess"`, `OPTIONS+="static_node=uinput"`). |
+| Rotatrix | L+D | cz + dm | `run_onchange_after_rotatrix.sh.tmpl` (dotfiles) : télécharge la version épinglée dans `.chezmoidata/rotatrix.yaml` avec la clé git-crypt `.secrets/encrypted_rotatrix_key`, installe `~/Applications/Rotatrix.AppImage`, l'entrée de menu et les icônes ; autostart par un lien chezmoi. `fuse2` (dm), groupe `input`. | Pas de règle udev dans decman : sur Arch, l'appli installe elle-même la sienne au premier lancement, ce qu'elle ne pouvait pas faire sur NixOS (vérifié le 28/09/2026). `/etc/rotatrix-key` ne sert plus. |
 | Flatpak PrusaSlicer stable + beta | L+D | fp + man. | `flatpak` ; `com.prusa3d.PrusaSlicer` déclaré | flathub est livré par le paquet. `flathub-beta` et `//beta` sont ajoutés **une fois à la main**, puis `//beta` va dans `ignored_packages`. Les mises à jour passent par Discover ou `flatpak update`. |
 | `uv-python` (nix-ld, cert.pem) | L+D | ✗ | — | Arch est FHS. |
 | Applications | L+D | dm | repo : `partitionmanager bind wl-clipboard kate dolphin-plugins signal-desktop freecad graphviz chromium jq gcc calibre esphome firefox kdeconnect libreoffice-still kio thunderbird`. AUR : `rustdesk-bin pcloud-drive openscad-git solvespace koreader-bin` | `openscad-git` : compilation lourde (le `openscad` d'extra date de 2021). |
@@ -344,7 +344,6 @@ Les secrets de srv-1 ne sont pas touchés.
    - `~/.ssh` ;
    - le profil Thunderbird ;
    - `~/Projects` ;
-   - `/etc/rotatrix-key` ;
    - les VM (D) ;
    - la bibliothèque Steam, si tu ne veux pas la retélécharger.
 2. Lancer le script de re-chiffrement (§5) **avant** d'effacer la dernière machine NixOS qui contient ces secrets.
@@ -366,7 +365,7 @@ Les secrets de srv-1 ne sont pas touchés.
 - `fprintd-enroll` (L) ;
 - `fwupdmgr refresh && fwupdmgr update` ;
 - `flatpak remote-add flathub-beta …` puis installer PrusaSlicer `//beta` ;
-- Rotatrix : la clé, l'AppImage, et supprimer l'ancien addon FreeCAD.
+- Rotatrix : rien à faire, `chezmoi apply` l'installe. Supprimer l'ancien addon FreeCAD.
 
 **Revenir à un snapshot.** Dans le menu Limine, ouvrir Snapshots, choisir le snapshot, puis son entrée `linux`. Le système démarre sur le snapshot avec un overlay en écriture (les changements sont perdus au redémarrage). `systemd-remount-fs.service` y échoue, et c'est attendu : il essaie de remonter un overlay avec les options btrfs de fstab. Pour rendre le retour définitif : `limine-snapper-restore` depuis ce démarrage (méthode `replace`, la valeur par défaut).
 
