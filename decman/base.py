@@ -28,6 +28,7 @@ class Base(Module):
             "fish", "fisher", "gnupg", "git-crypt", "chezmoi", "mise",
             "vim", "ripgrep",
             "pacman-contrib",  # paccache.timer, l'équivalent de nix gc
+            "man-db", "man-pages",
         }
 
     @aur.packages
@@ -36,7 +37,7 @@ class Base(Module):
 
     @systemd.units
     def units(self) -> set[str]:
-        return {"NetworkManager.service", "paccache.timer"}
+        return {"NetworkManager.service", "paccache.timer", "man-db.timer"}
 
     def files(self) -> dict[str, File]:
         return {
