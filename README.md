@@ -65,7 +65,7 @@ Ses `custom_commands` font deux choses :
   - les paquets posés par archinstall, qu'il faut déclarer pour que decman ne les supprime pas ;
   - le socle : fish, gnupg, git-crypt, chezmoi, mise ;
   - sudo sans mot de passe, les locales, `paccache.timer`.
-- `boot.py` : Limine avec `limine-mkinitcpio-hook`, la ligne de commande du noyau (`/etc/kernel/cmdline`), snapper, snap-pac et `limine-snapper-sync`.
+- `boot.py` : Limine avec `limine-mkinitcpio-hook`, la ligne de commande du noyau (`/etc/kernel/cmdline`), snapper, snap-pac et `limine-snapper-sync`, et la police de console (Terminus 22 px).
   - Chaque transaction pacman crée un snapshot avant et un après, et chacun devient démarrable depuis le menu Limine avec son propre noyau.
   - Au premier run, le module migre l'installation Limine d'archinstall vers celle de l'outil.
 
@@ -83,7 +83,7 @@ Ses `custom_commands` font deux choses :
   - l'empreinte digitale au verrouillage de l'écran, les profils d'énergie ;
   - le réveil par le clavier derrière le KVM, la blacklist audio du BIOS ;
   - les outils de mesure de la batterie ;
-  - pour l'écran dense : la police de console Terminus 22 px et la police du menu Limine doublée.
+  - pour l'écran dense : la police du menu Limine doublée.
 - `source.py` associe chaque hôte à ses paramètres noyau et à ses modules. desktop-gab n'a pas de module propre : juste `acpi_osi` pour la veille. Il ajoute aussi l'utilisateur aux groupes `docker`, `uucp` (ports série), `input` et `libvirt`.
 
 ## Revenir en arrière

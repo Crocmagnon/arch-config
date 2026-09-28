@@ -9,7 +9,7 @@ import re
 from decman import File, Module, prg
 from decman.plugins import aur, pacman, systemd
 
-# Sans cryptdevice= : c'est l'initramfs systemd qui ouvre LUKS, via /etc/crypttab.initramfs.
+# Sans cryptdevice= : c'est l'initramfs systemd qui ouvre LUKS, via /etc/crypttab (x-initrd.attach).
 CMDLINE = "root=/dev/mapper/root rootflags=subvol=@ rw rootfstype=btrfs zswap.enabled=0 quiet splash"
 ARCHINSTALL_EFI_LABEL = "Arch Linux Limine Bootloader"
 
@@ -21,7 +21,7 @@ class Boot(Module):
 
     @pacman.packages
     def pacman_packages(self) -> set[str]:
-        return {"snapper", "snap-pac"}
+        return {"snapper", "snap-pac", "terminus-font"}  # terminus-font : voir vconsole.conf
 
     @aur.packages
     def aur_packages(self) -> set[str]:
@@ -43,9 +43,13 @@ class Boot(Module):
                 "HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block plymouth"
                 " sd-encrypt filesystems sd-btrfs-overlayfs fsck)\n"
             )),
+            # Police de console de 22 px, lisible sur les écrans du laptop et du desktop, pour les TTY
+            # et les logs de démarrage. Le hook sd-vconsole la copie dans l'initramfs, que
+            # on_change régénère.
+            "/etc/vconsole.conf": File(content="KEYMAP=fr\nFONT=ter-122n\n"),
         }
 
-    # Aussi appelé au premier run : régénère initramfs et entrées avec la nouvelle cmdline.
+    # Aussi appelé au premier run : régénère initramfs et entrées (cmdline, HOOKS, police de console).
     def on_change(self, store) -> None:
         prg(["limine-update"])
 
