@@ -25,7 +25,7 @@ class Base(Module):
             # openssh : le client ssh (le serveur n'est activé que dans la VM de test).
             "openssh",
             # Ce qui doit exister avant mise et chezmoi.
-            "fish", "gnupg", "git-crypt", "chezmoi", "mise",
+            "fish", "fisher", "gnupg", "git-crypt", "chezmoi", "mise",
             "vim", "ripgrep",
             "pacman-contrib",  # paccache.timer, l'équivalent de nix gc
         }
