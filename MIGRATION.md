@@ -33,7 +33,7 @@ Cibles :
 | Swap | zram sur L et D, plus sur **L** un **swapfile btrfs** (`@swap`, taille = RAM) pour l'hibernation, créé par un `custom_command` d'archinstall : pas d'étape manuelle. La partition swap LUKS dédiée a été écartée à l'étape 1. Le menu d'archinstall exclut le swap du chiffrement (`disk/encryption_menu.py:318`). En JSON, archinstall ferait `swapon` sur la partition brute (`installer.py:396`) et mettrait sa clé dans la racine chiffrée, donc elle serait inaccessible avant la racine. Avec le swapfile, il n'y a qu'un volume LUKS, et la reprise passe par `HibernateLocation`, sans `resume=` ni offset. |
 | Initramfs | **systemd** (`sd-encrypt`) sur L et D. Il sert au déverrouillage du wallet (cf. ligne suivante) et, sur L, à la reprise d'hibernation. La bascule depuis le `encrypt` qu'archinstall pose se fait une seule fois, dans les `custom_commands` d'archinstall (§7). |
 | Wallet | **Déverrouillé automatiquement à l'autologin** avec la passphrase LUKS, via la recette du Arch Wiki « KDE Wallet » : `pam_systemd_loadkey` plus un override `KeyringMode=inherit` du service de connexion. |
-| Clés GPG et SSH (création) | **Une paire par machine perso, créée sur place** (28/09/2026) : clé SSH ed25519, clé GPG ed25519 [SC] + sous-clé cv25519 [E], expiration 2 ans. Rien n'est copié d'une machine à l'autre. Les machines du travail gardent leurs clés (`default-key` seulement sous `work` dans `gpg.conf`). Procédure en §7. |
+| Clés GPG et SSH (création) | **Une paire par machine perso, créée sur place** (28/09/2026) : clé SSH ed25519, clé GPG ed25519 [SC] + sous-clé cv25519 [E], expiration 2 ans. Rien n'est copié d'une machine à l'autre. Les machines du travail gardent leurs clés. `gpg.conf` pose `default-key Gabriel Augendre` partout : sans lui, gpg ≥ 2.3 signe avec la clé de la carte à puce présente, et la YubiKey du bureau reste branchée derrière le KVM (constaté sur le desktop le 28/09/2026). Le serveur de clés de l'entreprise n'est posé qu'au travail. Procédure en §7. |
 | Clés GPG et SSH | **Déverrouillées par le wallet.** gpg-agent sert d'agent SSH partout (setup du travail). pinentry-qt enregistre la passphrase dans KWallet via le protocole Secret Service, qui la lui rend ensuite sans question. Détail et limites (laptop du travail) en §6. |
 | Gestionnaire de connexion | **plasma-login-manager** (dépendance de `plasma-meta` 6.7), pas SDDM. |
 | Pare-feu | **ufw géré par decman** (règles dans `/etc/ufw/`, `ENABLED=yes`, `ufw.service`). `plasma-firewall` est installé par `plasma-meta`, mais on ne s'en sert pas : decman écraserait ses modifications. |
@@ -420,7 +420,7 @@ Sauvegarde de l'état **post-decman**.
 - réveil par le KVM ;
 - carte Ethernet ;
 - réglages AMD ;
-- sur le desktop, l'écran DisplayPort à l'invite LUKS et la veille (`acpi_osi`).
+- sur le desktop, l'écran DisplayPort à l'invite LUKS, y compris allumé après coup (vérifié le 28/09/2026 : le hook `kms` met `amdgpu` dans l'initramfs), et la veille (`acpi_osi`).
 
 ---
 
