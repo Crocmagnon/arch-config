@@ -47,10 +47,6 @@ class FrameworkGabAmd(Module):
             "/etc/udev/rules.d/90-usb-wakeup.rules": File(
                 content='ACTION=="add", SUBSYSTEM=="usb", DRIVER=="usb", TEST=="power/wakeup", ATTR{power/wakeup}="enabled"\n'
             ),
-            # Carte d'extension Ethernet Framework (Realtek) : autosuspend (nixos-hardware).
-            "/etc/udev/rules.d/90-framework-ethernet.rules": File(
-                content='ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="0bda", ATTR{idProduct}=="8156", ATTR{power/autosuspend}="20"\n'
-            ),
             # Le BIOS déclare à tort le périphérique ACP, d'où une interface audio fantôme (nixos-hardware).
             "/etc/modprobe.d/framework-acp.conf": File(
                 content="blacklist snd_acp70\nblacklist snd_acp_pci\n"

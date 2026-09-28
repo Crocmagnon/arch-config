@@ -191,13 +191,13 @@ Le Arch Wiki bloque les lectures automatiques. Les pages KDE Wallet, Snapper et 
 | Empreinte après une reprise de veille | ✗ pour l'instant, à tester sur le vrai laptop | une unité `fprintd-sleep.service` | Bug réel côté fprintd. D'abord tester sans ; sinon une seule unité (`Before=sleep.target`, `ExecStart=` arrête fprintd, `ExecStop=` le redémarre et relance `kscreenlocker_greet`), sans script system-sleep. |
 | Capot fermé sur secteur : rien (KVM) | pl | powerdevil `AC/SuspendAndShutdown LidAction=0` | |
 | Réveil par le clavier/souris derrière le KVM | dm | `/etc/udev/rules.d/90-usb-wakeup.rules` | |
-| Carte Ethernet Framework (autosuspend 0bda:8156) | dm | `/etc/udev/rules.d/90-framework-ethernet.rules` | Carte possédée, gardée. |
+| Carte Ethernet Framework (autosuspend 0bda:8156) | ✗ | — | Fonctionne sans réglage (pilote `r8152`). La règle de nixos-hardware ne réglait que le délai (`power/autosuspend=20`), pas `power/control=auto` : la carte ne se mettait jamais en veille, même sous NixOS (constaté le 28/09/2026). Retirée, la carte restant rarement branchée. |
 | Mesure batterie | dm | `powertop acpi` ; `powerstat` (AUR) | |
 | Profils d'énergie, capteurs, TRIM | dm | `power-profiles-daemon iio-sensor-proxy` + `fstrim.timer` | power-profiles-daemon n'est pas tiré par plasma-meta. |
 | Outil Framework | dm | `framework-system` (extra) | |
 | `framework-laptop-kmod` | ✗ | — | Intégré au noyau depuis 6.10 (`cros_ec_lpcs`, `cros_charge-control`, `cros_ec_hwmon`). Le seuil de charge peut aussi se régler dans le BIOS. |
 
-**Futur Framework 13 Pro (`framework-gab`)** : un module à part, avec `intel-ucode vulkan-intel lib32-vulkan-intel intel-media-driver`, sans les réglages AMD. Il reprend l'hibernation, le KVM, la carte Ethernet et l'empreinte.
+**Futur Framework 13 Pro (`framework-gab`)** : un module à part, avec `intel-ucode vulkan-intel lib32-vulkan-intel intel-media-driver`, sans les réglages AMD. Il reprend l'hibernation, le KVM et l'empreinte.
 
 ### 2.5 Desktop `desktop-gab` (D)
 
