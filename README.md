@@ -13,7 +13,7 @@ Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config,
 | Paquets, fichiers `/etc`, unités systemd, snapshots | [decman](https://github.com/kiviktnm/decman) | `decman/` |
 | Fichiers utilisateur | chezmoi | dépôt dotfiles |
 
-> **État (28/09/2026).** Le laptop `framework-gab-amd` tourne sous Arch avec cette config, vérifiée sur le matériel : hibernation, empreinte, réveil par le KVM, exit node Tailscale. Chaque machine perso a ses propres clés SSH et GPG. Prochaine étape : le desktop `desktop-gab` (sa config a été validée en VM ; restent l'écran DisplayPort à l'invite LUKS et la veille). srv-1 reste sous NixOS et se déploie depuis lui-même (`mise run srv-1` dans nixos-config). Le plan et les décisions sont dans [MIGRATION.md](MIGRATION.md).
+> **État (28/09/2026).** Migration depuis NixOS terminée : le laptop `framework-gab-amd` et le desktop `desktop-gab` tournent sous Arch avec cette config. Vérifié sur le matériel : sur le laptop, l'hibernation, l'empreinte et le réveil par le KVM ; sur le desktop, l'écran DisplayPort à l'invite LUKS (y compris allumé après coup) et la veille ; sur les deux, l'exit node Tailscale. Chaque machine perso a ses propres clés SSH et GPG. srv-1 reste sous NixOS et se déploie depuis lui-même (`mise run srv-1` dans nixos-config). Le futur Framework 13 Pro (`framework-gab`) aura son module d'hôte. Les décisions sont dans [MIGRATION.md](MIGRATION.md).
 
 ## Installer une machine
 

@@ -414,13 +414,14 @@ Sauvegarde de l'état **post-decman**.
 - **Dans la VM**, depuis post-decman : `chezmoi init`, `git-crypt unlock`, puis `chezmoi apply` depuis un TTY. À la première connexion graphique, on contrôle le thème auto, les polices, les clés Plasma et le déverrouillage GPG/SSH par le wallet.
 - **Garde-fou avant la fusion :** `chezmoi diff` sur le laptop du travail et sur le serveur du travail. Il ne doit montrer que les changements voulus.
 
-**Étape 4 : matériel réel.** D'abord le laptop AMD (desktop-gab reste sous NixOS et continue de servir de banc), le desktop en dernier. Contrôles impossibles en VM :
+**Étape 4 : matériel réel.** Faite le 28/09/2026 : d'abord le laptop AMD (desktop-gab restait sous NixOS et servait de banc), puis le desktop, installé en SSH depuis le laptop. Contrôles impossibles en VM, tous vérifiés :
 - hibernation réelle et réveil RTC ;
 - empreinte digitale ;
 - réveil par le KVM ;
-- carte Ethernet ;
+- carte Ethernet (fonctionne sans réglage ; la règle d'autosuspend est retirée) ;
 - réglages AMD ;
-- sur le desktop, l'écran DisplayPort à l'invite LUKS, y compris allumé après coup (vérifié le 28/09/2026 : le hook `kms` met `amdgpu` dans l'initramfs), et la veille (`acpi_osi`).
+- sur le desktop, l'écran DisplayPort à l'invite LUKS, y compris allumé après coup (vérifié le 28/09/2026 : le hook `kms` met `amdgpu` dans l'initramfs), et la veille (`acpi_osi`) ;
+- sur les deux, l'exit node Tailscale (`rp_filter=2` malgré ufw) et la police de console (Terminus 22 px, commune).
 
 ---
 

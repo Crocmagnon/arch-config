@@ -1,6 +1,6 @@
 # Banc de test VM
 
-Il tourne sur desktop-gab, encore sous NixOS : libvirt et virt-manager y sont déjà (`nixos-config/modules/nixos/desktop/virt.nix`). Toutes les commandes se lancent **sur l'hôte**, sauf indication contraire.
+Il a tourné sur desktop-gab, alors sous NixOS (libvirt et virt-manager via `nixos-config/modules/nixos/desktop/virt.nix`), jusqu'à la migration de celui-ci. Le disque et ses états ont disparu avec. Pour le recréer, n'importe quelle machine Arch de ce dépôt convient : `desktop.py` y installe libvirt, virt-manager et OVMF. Les passages propres à NixOS (pare-feu, réseau `default`) sont à adapter. Toutes les commandes se lancent **sur l'hôte**, sauf indication contraire.
 
 La VM s'appelle `arch-test`. Ses fichiers sont dans `/var/lib/libvirt/images/arch-test/`.
 
