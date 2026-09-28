@@ -80,6 +80,7 @@ Ses `custom_commands` font deux choses :
 - `/etc/makepkg.conf.d/parallel.conf` fait compiler sur tous les cœurs (makepkg n'en utilise qu'un par défaut).
 - `framework_gab_amd.py` (laptop) :
   - l'hibernation (veille, puis hibernation au bout d'une heure) et la levée du verrouillage de Plasma après une hibernation de plus de 5 min ;
+  - une trace en cas de blocage pendant la veille ou l'hibernation : panique, trace dans pstore (EFI), archivée dans `/var/lib/systemd/pstore` au démarrage suivant ;
   - l'empreinte digitale au verrouillage de l'écran, les profils d'énergie ;
   - le réveil par le clavier derrière le KVM, la blacklist audio du BIOS ;
   - les outils de mesure de la batterie ;

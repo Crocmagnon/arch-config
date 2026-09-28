@@ -24,7 +24,11 @@ class FrameworkGabAmd(Module):
 
     @systemd.units
     def units(self) -> set[str]:
-        return {"power-profiles-daemon.service"}
+        return {
+            "power-profiles-daemon.service",
+            # Copie les traces pstore dans /var/lib/systemd/pstore et libère les variables EFI.
+            "systemd-pstore.service",
+        }
 
     def files(self) -> dict[str, File]:
         return {
@@ -40,6 +44,10 @@ class FrameworkGabAmd(Module):
             # le verrouillage de Plasma. Les hooks de veille ne sont lus que dans /usr/lib.
             "/usr/lib/systemd/system-sleep/unlock-after-hibernate": File(
                 source_file=f"{FILES}/unlock-after-hibernate", permissions=0o755
+            ),
+            # Panique sur blocage pendant la veille et l'hibernation, pour garder une trace (pstore).
+            "/usr/lib/systemd/system-sleep/panic-on-hang": File(
+                source_file=f"{FILES}/panic-on-hang", permissions=0o755
             ),
             # Clavier et souris derrière le KVM : réveil par USB (le KVM rattache le hub à chaque
             # bascule, un réglage ponctuel ne survivrait pas).

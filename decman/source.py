@@ -21,7 +21,11 @@ decman.execution_order = ["pacman", "aur", "flatpak", "files", "systemd"]
 # Par hôte : paramètres noyau en plus de ceux de boot.py, et modules propres.
 HOSTS = {
     "framework-gab-amd": (
-        ("amdgpu.dcdebugmask=0x10",),  # PSR (nixos-hardware)
+        (
+            "amdgpu.dcdebugmask=0x10",  # PSR (nixos-hardware)
+            # pstore EFI, désactivé par défaut dans le noyau Arch : trace d'un blocage d'hibernation.
+            "efi_pstore.pstore_disable=0",
+        ),
         [Amd(), FrameworkGabAmd()],
     ),
     "desktop-gab": (
