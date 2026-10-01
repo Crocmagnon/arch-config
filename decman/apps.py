@@ -16,9 +16,7 @@ class Apps(Module):
             "libreoffice-still", "calibre",
             "steam",  # dépôt multilib, activé par archinstall ; pilote Vulkan dans le module du GPU
             "fuse2",  # AppImages (Rotatrix, nRF Connect)
-            # git : lfs, et les convertisseurs des diff textconv de la config git
-            "git-lfs", "python-pygments", "pandoc-cli", "poppler", "perl-image-exiftool", "unzip",
-            "bind", "jq", "watchexec", "htop", "btop", "clang",
+            "git-lfs", "unzip", "bind", "jq", "watchexec", "htop", "btop", "clang",
             "vscode-json-languageserver", "yaml-language-server",
             "luarocks", "luacheck", "busted",  # outils Lua absents de mise (luajit, stylua, lua-language-server y sont)
         }
