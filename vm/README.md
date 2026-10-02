@@ -155,4 +155,8 @@ Pour voir ce que plymouth masque (effet au prochain démarrage à froid) :
 virt-xml -c qemu:///system arch-test --edit --serial log.file=/var/log/libvirt/qemu/arch-test-serial.log,log.append=off
 ```
 
-Ensuite, dans la VM, remplacer `quiet splash` par `console=ttyS0,115200 console=tty1 loglevel=7` dans `/boot/EFI/arch-limine/limine.conf`. Un `state.sh reset` annule cette modification.
+Ensuite, dans la VM, remplacer `quiet splash` par `console=ttyS0,115200 console=tty1 loglevel=7` dans la ligne de commande du noyau :
+- avant decman (état `post-archinstall`) : dans `/boot/EFI/arch-limine/limine.conf`, l'installation Limine d'archinstall ;
+- après decman : dans `/etc/kernel/cmdline`, puis `sudo limine-update`. `boot.py` a retiré l'ancien fichier, et `limine.conf` est régénéré depuis `cmdline`. Le prochain decman remet la valeur du dépôt.
+
+Un `state.sh reset` annule cette modification.
