@@ -13,6 +13,8 @@ Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config,
 | Paquets, fichiers `/etc`, unités systemd, snapshots | [decman](https://github.com/kiviktnm/decman) | `decman/` |
 | Fichiers utilisateur | chezmoi | dépôt dotfiles |
 
+Pour savoir où va une chose : ce qui demande root ou ne concerne qu'Arch va ici (paquets, `/etc`, unités système, udev, groupes), ainsi que les outils nécessaires avant chezmoi et mise. Tout ce qui vit sous `$HOME` va dans dotfiles, y compris les unités utilisateur et les réglages Plasma. dotfiles sert aussi les machines du travail (Ubuntu, Debian). Un outil en ligne de commande utile partout vient donc de mise, dans dotfiles. Un outil propre à Arch, ou que mise ne sait pas installer, vient de pacman, ici.
+
 > **État (28/09/2026).** Migration depuis NixOS terminée : le laptop `framework-gab-amd` et le desktop `desktop-gab` tournent sous Arch avec cette config. Vérifié sur le matériel : sur le laptop, l'hibernation, l'empreinte et le réveil par le KVM ; sur le desktop, l'écran DisplayPort à l'invite LUKS (y compris allumé après coup) et la veille ; sur les deux, l'exit node Tailscale. Chaque machine perso a ses propres clés SSH et GPG. srv-1 reste sous NixOS et se déploie depuis lui-même (`mise run srv-1` dans nixos-config). Le futur Framework 13 Pro (`framework-gab`) aura son module d'hôte. Les décisions sont dans [MIGRATION.md](MIGRATION.md).
 
 ## Installer une machine

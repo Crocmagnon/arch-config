@@ -56,15 +56,11 @@ Test in the VM bench (`vm/README.md`) before touching real hardware: `vm/state.s
 - **gpg-agent starts about 1 s before the Plasma session, without a display.** SSH requests carry no display, so pinentry needs `updatestartuptty`, run by a dotfiles XDG autostart entry and by every interactive fish. In VM tests, never run `updatestartuptty` from a display-less ssh command: it wipes the display.
 - **GnuPG stays in `~/.gnupg`.** gpg-agent is the SSH agent, and Arch does not export `SSH_AUTH_SOCK` for it. chezmoi handles that.
 
-## dotfiles (chezmoi) gotchas
+## Boundary with dotfiles
 
-The chezmoi side lives in the `dotfiles` repo (`main`).
-- **Templates run with `missingkey=error`:** use `get . "work"`, never `.work`. Machines that have not re-run `chezmoi init` lack the key.
-- **`{{-` also eats the newline before the tag, gluing headings together.** Put tags on their own line with `-}}` only.
-- **chezmoi skips only truly empty renders:** a lone `\n` still creates the file.
-- **Never template a file that already contains `{{`** (kitty.conf has 23 in its comments). Include a small templated file instead (`shell.conf`).
-- **Test renders without touching `$HOME`:** `nix shell nixpkgs#chezmoi --command chezmoi --config <tmp.toml> --source . --destination <tmp> execute-template` or `managed`. `--promptBool` matches the prompt *text*, not the key.
-- **Once dotfiles is unlocked, never print a rendered template that includes a secret.** Use `chezmoi apply` without `-v`, and `chezmoi status` for names only.
+The user side lives in the `dotfiles` repo (chezmoi, `main`, cloned at `~/.local/share/chezmoi`), whose `CLAUDE.md` holds the chezmoi gotchas. dotfiles serves four machines, two of them work machines on Ubuntu and Debian; this repo serves only the Arch desktops. Where a thing goes:
+- **Here (decman):** anything that needs root or is specific to Arch: packages, `/etc`, system units, udev, groups, plus the tools that must exist before chezmoi and mise run (`base.py`).
+- **dotfiles:** anything under `$HOME`, including user units and Plasma settings. A CLI tool also wanted on the work machines comes from mise there; one that only matters on Arch, or that mise cannot build, comes from pacman here.
 
 ## Working rules
 
