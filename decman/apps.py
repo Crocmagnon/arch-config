@@ -32,4 +32,5 @@ class Apps(Module):
             # les déclarer aussi les ferait réinstaller à chaque run (déjà là, mais pas explicites).
             "nrfconnect-appimage", "nrfutil",
             "git-toolbelt", "amber-search-bin", "fresh-editor-bin",
+            "crush-bin",
         }
