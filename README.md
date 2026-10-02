@@ -61,7 +61,6 @@ Dans un terminal Plasma (pinentry-qt et le wallet ne sont là qu'en session grap
 2. Comptes et services :
    - `tailscale up`, appairage KDE Connect ;
    - connexions : Signal, pCloud, Steam, `claude` ; restauration du profil Thunderbird ;
-   - `herdr integration install claude` ;
    - `fprintd-enroll` (laptop) ;
    - `fwupdmgr refresh && fwupdmgr update` ;
    - `flatpak remote-add flathub-beta …`, installer PrusaSlicer `//beta`, puis l'ajouter à `ignored_packages` (decman ne gère ni remotes ni branches).
