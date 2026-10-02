@@ -93,7 +93,7 @@ Ses `custom_commands` font deux choses :
   - Plasma et ses applications, plasma-login-manager en autologin.
   - Le wallet KDE ouvert à l'autologin avec la passphrase LUKS : `pam_systemd_loadkey` dans une copie de `plasmalogin-autologin`, et `KeyringMode=inherit` sur `plasmalogin.service`.
   - Audio, Bluetooth, impression, Docker, Tailscale, iPhone, VM (libvirt et virt-manager).
-  - ufw (entrée refusée, sauf KDE Connect et le réseau NAT de libvirt ; `rp_filter` lâche pour l'exit node Tailscale), Flatpak (PrusaSlicer).
+  - ufw (entrée refusée, sauf KDE Connect et le réseau NAT de libvirt ; ports Docker publiés sur localhost seulement, `-p 0.0.0.0:…` pour les ouvrir au LAN ; `rp_filter` lâche pour l'exit node Tailscale), Flatpak (PrusaSlicer).
 - `apps.py` : les applications (Firefox, Chromium, Signal, Thunderbird, FreeCAD, LibreOffice, calibre, Steam, openscad-git, suite Nordic nRF…) et les outils en ligne de commande qui ne viennent pas de mise.
 - `amd.py` : le microcode et les pilotes Vulkan pour les machines AMD.
 - Les paquets AUR se compilent sous l'utilisateur système `builduser`. Les clés PGP des sources signées lui sont fournies par `source.py`.

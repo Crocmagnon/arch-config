@@ -59,10 +59,15 @@ class Desktop(Module):
             ),
             # rp_filter lâche pour l'exit node Tailscale : voir le fichier.
             "/etc/ufw/sysctl.conf": File(source_file="./files/desktop/ufw-sysctl.conf"),
+            # Docker accepte un port publié avant les chaînes ufw : un -p 8080:80 serait ouvert au
+            # LAN. Les ports publiés n'écoutent que sur localhost, sauf -p 0.0.0.0:8080:80 explicite.
+            "/etc/docker/daemon.json": File(content='{"ip": "127.0.0.1"}\n'),
         }
 
     # Aussi appelé au premier run.
     def on_change(self, store) -> None:
+        # Docker ne relit daemon.json qu'au démarrage ; try-restart ne démarre pas un daemon arrêté.
+        prg(["systemctl", "try-restart", "docker.service"])
         prg(["ufw", "default", "deny", "incoming"])
         prg(["ufw", "default", "allow", "outgoing"])
         prg(["ufw", "--force", "enable"])
