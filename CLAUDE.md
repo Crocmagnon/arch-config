@@ -9,7 +9,7 @@ Declarative Arch Linux config for the user's desktops (`framework-gab-amd`, `des
 - decman for system packages, `/etc` files, systemd units and snapshots;
 - user files live in the separate chezmoi `dotfiles` repo.
 
-`MIGRATION.md` holds the NixOS → Arch inventory, every settled decision (§0) and the phased plan (§9). Read §0 before changing anything.
+The NixOS → Arch migration is done. Its inventory and decisions live in git history (`git log -- MIGRATION.md`); the rules that still apply are below.
 
 ## Commands
 
@@ -30,9 +30,10 @@ Test in the VM bench (`vm/README.md`) before touching real hardware: `vm/state.s
 - One module per concern (`base.py`, `boot.py`, …), then host modules. Files owned by a module live in `decman/files/<module>/`.
 - `archinstall/user_configuration.json` has placeholders (`@HOSTNAME@`, `@DEVICE@`, `"@ROOT_MIB@"`) filled by `render.sh`.
 
-## Rules and gotchas (all verified; see MIGRATION.md for sources)
+## Rules and gotchas (all verified)
 
 - **decman removes every explicit package that is not declared, and every orphan.** An optional dependency counts as an orphan: that is why `wpa_supplicant` is declared, since without it the laptop loses Wi-Fi. Declare meta-packages, never groups. Before a first real run, compare `--dry-run` with `pacman -Qqe`.
+- **ufw is the firewall, managed by decman.** `plasma-firewall` comes with `plasma-meta` but must not be used: decman would overwrite its changes.
 - **Execution order is `pacman, aur, flatpak, files, systemd`.** Writing a file that a not-yet-installed package owns would make pacman fail.
 - **decman enables units, never starts them.** It only touches units that are, or were, declared.
 - **`on_change` also runs on the first run, together with `on_enable`.** Do not repeat work in both.

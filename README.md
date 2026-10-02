@@ -15,7 +15,7 @@ Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config,
 
 Pour savoir où va une chose : ce qui demande root ou ne concerne qu'Arch va ici (paquets, `/etc`, unités système, udev, groupes), ainsi que les outils nécessaires avant chezmoi et mise. Tout ce qui vit sous `$HOME` va dans dotfiles, y compris les unités utilisateur et les réglages Plasma. dotfiles sert aussi les machines du travail (Ubuntu, Debian). Un outil en ligne de commande utile partout vient donc de mise, dans dotfiles. Un outil propre à Arch, ou que mise ne sait pas installer, vient de pacman, ici.
 
-> **État (28/09/2026).** Migration depuis NixOS terminée : le laptop `framework-gab-amd` et le desktop `desktop-gab` tournent sous Arch avec cette config. Vérifié sur le matériel : sur le laptop, l'hibernation, l'empreinte et le réveil par le KVM ; sur le desktop, l'écran DisplayPort à l'invite LUKS (y compris allumé après coup) et la veille ; sur les deux, l'exit node Tailscale. Chaque machine perso a ses propres clés SSH et GPG. srv-1 reste sous NixOS et se déploie depuis lui-même (`mise run srv-1` dans nixos-config). Le futur Framework 13 Pro (`framework-gab`) aura son module d'hôte. Les décisions sont dans [MIGRATION.md](MIGRATION.md).
+> **État (28/09/2026).** Migration depuis NixOS terminée : le laptop `framework-gab-amd` et le desktop `desktop-gab` tournent sous Arch avec cette config. Vérifié sur le matériel : sur le laptop, l'hibernation, l'empreinte et le réveil par le KVM ; sur le desktop, l'écran DisplayPort à l'invite LUKS (y compris allumé après coup) et la veille ; sur les deux, l'exit node Tailscale. Chaque machine perso a ses propres clés SSH et GPG. srv-1 reste sous NixOS et se déploie depuis lui-même (`mise run srv-1` dans nixos-config). Le futur Framework 13 Pro (`framework-gab`) aura son module d'hôte : `intel-ucode vulkan-intel lib32-vulkan-intel intel-media-driver` à la place du module `amd`, et l'hibernation, le KVM et l'empreinte du laptop actuel. L'inventaire et les décisions de la migration sont dans l'historique git (`git log -- MIGRATION.md`).
 
 ## Installer une machine
 
@@ -41,15 +41,34 @@ Pour savoir où va une chose : ce qui demande root ou ne concerne qu'Arch va ici
    ```
    Le premier run n'installe pas les Flatpak : le plugin Flatpak de decman est chargé au démarrage, avant que pacman n'installe `flatpak`. Un second `sudo decman` s'en charge. Le `--dry-run` doit n'enlever aucun paquet utile. Comparer sa sortie avec `pacman -Qqe`. Le chemin de la source n'est mémorisé qu'au premier vrai run : ce run-là prend donc aussi `--source`, et les suivants s'en passent.
 
-6. Appliquer les dotfiles depuis un TTY, avant la première session graphique (les raccourcis Plasma ne sont relus qu'à la connexion) :
+6. Toujours sur le TTY, avant la première session graphique (les raccourcis Plasma ne sont relus qu'à la connexion), appliquer les dotfiles :
    ```sh
-   chezmoi init <dépôt dotfiles>          # sans --apply : les templates lisent des fichiers git-crypt
-   cd ~/.local/share/chezmoi && git-crypt unlock /tmp/gc.key && shred -u /tmp/gc.key
-   chezmoi init                           # répondre : travail non, serveur non
-   chezmoi apply && fish -lc 'mise install'
+   scripts/bootstrap-dotfiles.sh
    ```
+   Il clone dotfiles en HTTPS, le déverrouille avec la clé git-crypt collée en base64 depuis Bitwarden, répond « travail non, serveur non », puis lance `chezmoi apply` et `mise install`. Relançable sans risque. Puis redémarrer.
 
-Les étapes manuelles (sauvegardes, secrets, comptes) sont listées dans [MIGRATION.md §7](MIGRATION.md#7-étapes).
+## Après la première connexion
+
+Dans un terminal Plasma (pinentry-qt et le wallet ne sont là qu'en session graphique) :
+
+1. Créer les clés de la machine, en cochant « enregistrer dans le gestionnaire de mots de passe » à chaque pinentry :
+   ```sh
+   ssh-keygen -t ed25519 -C "gaugendre@$(hostname)"
+   ssh-add ~/.ssh/id_ed25519
+   gpg --quick-generate-key "Gabriel Augendre <gabriel@augendre.info>" default default 2y
+   ```
+   Sauvegarder la clé GPG secrète (`gpg --armor --export-secret-keys`) et son certificat de révocation (`~/.gnupg/openpgp-revocs.d/`) dans Bitwarden. Publier les deux clés publiques sur Codeberg et GitHub, la clé SSH dans `modules/nixos/common/users.nix` (nixos-config, déployé sur srv-1) et sur `hass`. Passer ensuite les remotes de dotfiles et arch-config en SSH.
+2. Comptes et services :
+   - `tailscale up`, appairage KDE Connect ;
+   - connexions : Signal, pCloud, Steam, `claude` ; restauration du profil Thunderbird ;
+   - `herdr integration install claude` ;
+   - `fprintd-enroll` (laptop) ;
+   - `fwupdmgr refresh && fwupdmgr update` ;
+   - `flatpak remote-add flathub-beta …`, installer PrusaSlicer `//beta`, puis l'ajouter à `ignored_packages` (decman ne gère ni remotes ni branches).
+3. Contrôles :
+   - `sysctl net.ipv4.conf.all.rp_filter` vaut 2 (exit node Tailscale) ;
+   - laptop : `test -e /sys/class/rtc/rtc0/wakealarm`, puis une hibernation et sa reprise ;
+   - `ssh-add -l` depuis une application graphique.
 
 ## Ce que fait l'installation
 
@@ -91,7 +110,13 @@ Ses `custom_commands` font deux choses :
 
 ## Revenir en arrière
 
-Dans le menu Limine, ouvrir **Snapshots**, puis un snapshot, puis son entrée `linux`. Le système démarre sur ce snapshot, avec un overlay en écriture qui disparaît au redémarrage. Pour rendre le retour définitif, lancer `limine-snapper-restore` depuis ce démarrage.
+Dans le menu Limine, ouvrir **Snapshots**, puis un snapshot, puis son entrée `linux`. Le système démarre sur ce snapshot, avec un overlay en écriture qui disparaît au redémarrage. `systemd-remount-fs.service` y échoue, et c'est attendu : il essaie de remonter l'overlay avec les options btrfs de fstab. Pour rendre le retour définitif, lancer `limine-snapper-restore` depuis ce démarrage.
+
+## Entretien
+
+- `openscad-git` n'est recompilé qu'avec `sudo decman --params aur-upgrade-devel`.
+- Après une mise à jour de ufw, fusionner le `.pacnew` de `/etc/ufw/sysctl.conf` (decman le gère avec `rp_filter=2`).
+- Plus tard, en option : Secure Boot (`sbctl create-keys`, `enroll-keys -m`, signer l'EFI de Limine, puis `limine enroll-config`).
 
 ## Tester
 
