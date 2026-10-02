@@ -19,6 +19,7 @@ class Apps(Module):
             "git-lfs", "unzip", "bind", "jq", "watchexec", "htop", "btop", "clang",
             "vscode-json-languageserver", "yaml-language-server",
             "luarocks", "luacheck", "busted",  # outils Lua absents de mise (luajit, stylua, lua-language-server y sont)
+            "opencode",
         }
 
     @aur.packages
