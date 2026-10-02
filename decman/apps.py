@@ -13,7 +13,7 @@ class Apps(Module):
         return {
             "firefox", "chromium", "signal-desktop", "thunderbird",
             "freecad", "graphviz",  # graphviz : graphe des dépendances dans FreeCAD
-            "libreoffice-still", "calibre",
+            "libreoffice-still", "calibre", "tldr",
             "steam",  # dépôt multilib, activé par archinstall ; pilote Vulkan dans le module du GPU
             "fuse2",  # AppImages (Rotatrix, nRF Connect)
             "git-lfs", "unzip", "bind", "jq", "watchexec", "htop", "btop", "clang",
@@ -30,5 +30,5 @@ class Apps(Module):
             # Suite Nordic nRF. nrf-udev et jlink-software-and-documentation en sont des dépendances :
             # les déclarer aussi les ferait réinstaller à chaque run (déjà là, mais pas explicites).
             "nrfconnect-appimage", "nrfutil",
-            "tlrc-bin", "git-toolbelt", "amber-search-bin", "fresh-editor-bin",
+            "git-toolbelt", "amber-search-bin", "fresh-editor-bin",
         }
