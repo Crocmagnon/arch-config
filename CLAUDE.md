@@ -54,8 +54,7 @@ Test in the VM bench (`vm/README.md`) before touching real hardware: `vm/state.s
 - **The autologin wallet is served by `ksecretd`** (KWallet 6), which owns `org.freedesktop.secrets` and is unlocked by PAM. Check it with the Secret Service `Locked` property of `/org/freedesktop/secrets/collection/kdewallet`. The legacy `org.kde.kwalletd6` name is a separate process that reports the wallet closed; whether apps using it re-prompt is still to be checked.
 - **ufw overrides sysctl at start with `/etc/ufw/sysctl.conf`**, which sets `rp_filter=1` (strict) and breaks the Tailscale exit node. decman owns that file with `rp_filter=2`. After a ufw upgrade, merge the `.pacnew`.
 - **ufw denies all incoming traffic, SSH included.** The real machines run no SSH server. In the VM, chain `sudo ufw allow ssh` in the same command as the first real decman run: the running session survives (established connections pass), new ones do not (recovery: a TTY via `virsh send-key`).
-- **gpg-agent starts about 1 s before the Plasma session, without a display.** SSH requests carry no display, so pinentry needs `updatestartuptty`, run by a dotfiles XDG autostart entry and by every interactive fish. In VM tests, never run `updatestartuptty` from a display-less ssh command: it wipes the display.
-- **GnuPG stays in `~/.gnupg`.** gpg-agent is the SSH agent, and Arch does not export `SSH_AUTH_SOCK` for it. chezmoi handles that.
+- **gpg-agent is the SSH agent, set up by dotfiles**, whose `CLAUDE.md` holds its gotchas. In VM tests, never run `gpg-connect-agent updatestartuptty` from a display-less ssh command: it wipes the display pinentry uses.
 
 ## Boundary with dotfiles
 
