@@ -57,7 +57,9 @@ class Boot(Module):
     # limine-mkinitcpio-hook (binaire déjà déployé par son hook pacman à l'installation).
     # L'ancienne n'est retirée qu'une fois la nouvelle vérifiée : sinon, plus de démarrage.
     def on_enable(self, store) -> None:
-        prg(["snapper", "--no-dbus", "-c", "root", "create-config", "/"])
+        # Relancé tant que la vérification ci-dessous échoue : create-config refuse une config existante.
+        if not os.path.exists("/etc/snapper/configs/root"):
+            prg(["snapper", "--no-dbus", "-c", "root", "create-config", "/"])
         prg(["snapper", "--no-dbus", "-c", "root", "set-config", "TIMELINE_CREATE=no", "NUMBER_LIMIT=10"])
 
         prg(["limine-update"])
