@@ -62,6 +62,13 @@ The user side lives in the `dotfiles` repo (chezmoi, `main`, cloned at `~/.local
 - **Here (decman):** anything that needs root or is specific to Arch: packages, `/etc`, system units, udev, groups, plus the tools that must exist before chezmoi and mise run (`base.py`).
 - **dotfiles:** anything under `$HOME`, including user units and Plasma settings. A CLI tool also wanted on the work machines comes from mise there; one that only matters on Arch, or that mise cannot build, comes from pacman here.
 
+This repo owns the list of tools dotfiles relies on that come from pacman instead of mise:
+- **needed before mise:** `fish`, `fisher`, `gnupg`, `git-crypt`, `chezmoi`, `mise` (`base.py`); dotfiles disables the mise copies of chezmoi and git-crypt on Arch;
+- **absent from mise:** `luarocks`, `luacheck`, `busted` (`apps.py`);
+- **called outside an interactive fish**, where mise is not activated: `git-lfs` (git filter marked `required`), `jq` (Claude Code statusline), `claude-code` (`run_onchange` MCP script).
+
+On the work machines the same tools come from apt (laptop) or a local mise config (server).
+
 ## Working rules
 
 - Never decrypt, print or modify secrets: git-crypt files in dotfiles, agenix files in nixos-config. The user runs re-encryption scripts themselves.
