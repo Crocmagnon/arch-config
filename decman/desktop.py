@@ -61,11 +61,19 @@ class Desktop(Module):
             "/etc/ufw/sysctl.conf": File(source_file="./files/desktop/ufw-sysctl.conf"),
         }
 
-    # Aussi appelé au premier run. ponytail: additif, ufw ignore une règle déjà présente ; une
-    # règle retirée d'ici reste active, à supprimer à la main (ufw delete).
+    # Aussi appelé au premier run.
     def on_change(self, store) -> None:
         prg(["ufw", "default", "deny", "incoming"])
         prg(["ufw", "default", "allow", "outgoing"])
+        prg(["ufw", "--force", "enable"])
+
+    # À chaque run, après on_change : on_change ne voit pas un changement de ce code, seulement des
+    # fichiers, paquets et unités. ufw ignore une règle déjà présente ; une règle retirée d'ici
+    # reste active, à supprimer à la main (ufw delete).
+    def after_update(self, store) -> None:
         for proto in ("tcp", "udp"):
             prg(["ufw", "allow", f"1714:1764/{proto}", "comment", "KDE Connect"])
-        prg(["ufw", "--force", "enable"])
+        # Réseau NAT « default » de libvirt : DHCP et DNS de dnsmasq vers l'hôte, trafic des VM
+        # vers l'extérieur. Sans ça, ufw les bloque et une VM n'obtient pas d'IP.
+        prg(["ufw", "allow", "in", "on", "virbr0", "comment", "libvirt"])
+        prg(["ufw", "route", "allow", "in", "on", "virbr0", "comment", "libvirt"])
