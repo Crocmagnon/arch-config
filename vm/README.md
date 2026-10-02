@@ -121,7 +121,7 @@ vm/state.sh list
    - Le vrai run se lance dans un terminal, parce que pacman pose ses questions. Depuis un SSH non interactif, on passe par `vm/answer.py decman`, qui répond `y` aux confirmations et Entrée aux choix numérotés.
    - decman active ufw, qui refuse toute connexion entrante, SSH compris. La session en cours survit (ufw laisse passer les connexions établies), mais pas les suivantes : enchaîner `sudo ufw allow ssh` dans la même commande que le premier vrai run. Les vraies machines n'ouvrent pas SSH.
    - Redémarrer, contrôler, puis `state.sh save post-decman`.
-4. `chezmoi init`, puis `git-crypt unlock`, puis `chezmoi apply` depuis un TTY, puis la première connexion graphique.
+4. `sudo hostnamectl chassis desktop`, puis `scripts/bootstrap-dotfiles.sh` depuis un TTY, puis la première connexion graphique. Dans une VM, `hostnamectl chassis` répond `vm`, et chezmoi en déduirait une machine sans bureau : la commande écrit `CHASSIS=desktop` dans `/etc/machine-info`. Ne jamais la lancer sur une vraie machine, où la DMI donne déjà le bon type.
 
 En cas d'échec à une étape : `state.sh reset <état précédent>`.
 

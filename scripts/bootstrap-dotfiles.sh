@@ -34,7 +34,8 @@ if [ ! -e "$src/.git/git-crypt/keys/default" ]; then
 fi
 
 # --promptBool répond par le texte des questions de .chezmoi.toml.tmpl, pas par les clés.
-chezmoi init --promptBool "Machine du travail=false,Machine sans bureau (serveur)=false"
+# headless n'est pas demandé : il se déduit de hostnamectl chassis.
+chezmoi init --promptBool "Machine du travail=false"
 chezmoi apply  # sans -v : les fichiers rendus contiennent des secrets
 # Shell de connexion : conf.d exporte le token GitHub, qui évite les limites de l'API.
 fish -lc 'mise install'

@@ -45,7 +45,7 @@ Pour savoir où va une chose : ce qui demande root ou ne concerne qu'Arch va ici
    ```sh
    scripts/bootstrap-dotfiles.sh
    ```
-   Il clone dotfiles en HTTPS, le déverrouille avec la clé git-crypt collée en base64 depuis Bitwarden, répond « travail non, serveur non », puis lance `chezmoi apply`, `mise install` et un second `chezmoi apply` pour les scripts qui attendaient un outil de mise. Relançable sans risque. Puis redémarrer.
+   Il clone dotfiles en HTTPS, le déverrouille avec la clé git-crypt collée en base64 depuis Bitwarden, répond « travail non », puis lance `chezmoi apply`, `mise install` et un second `chezmoi apply` pour les scripts qui attendaient un outil de mise. Relançable sans risque. Puis redémarrer.
 
 ## Après la première connexion
 
