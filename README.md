@@ -65,7 +65,7 @@ Ses `custom_commands` font deux choses :
 **decman** (`decman/source.py` choisit les modules selon le hostname) :
 - `base.py` :
   - les paquets posés par archinstall, qu'il faut déclarer pour que decman ne les supprime pas ;
-  - le socle : fish, gnupg, git-crypt, chezmoi, mise ;
+  - le socle : fish, gnupg, git-crypt, chezmoi, mise, man (avec `man-db.timer`) ;
   - sudo sans mot de passe, les locales, `paccache.timer`.
 - `boot.py` : Limine avec `limine-mkinitcpio-hook`, la ligne de commande du noyau (`/etc/kernel/cmdline`), snapper, snap-pac et `limine-snapper-sync`, et la police de console (Terminus 22 px).
   - Chaque transaction pacman crée un snapshot avant et un après, et chacun devient démarrable depuis le menu Limine avec son propre noyau.

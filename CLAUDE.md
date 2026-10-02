@@ -33,7 +33,7 @@ Test in the VM bench (`vm/README.md`) before touching real hardware: `vm/state.s
 ## Rules and gotchas (all verified; see MIGRATION.md for sources)
 
 - **decman removes every explicit package that is not declared, and every orphan.** An optional dependency counts as an orphan: that is why `wpa_supplicant` is declared, since without it the laptop loses Wi-Fi. Declare meta-packages, never groups. Before a first real run, compare `--dry-run` with `pacman -Qqe`.
-- **Execution order is `pacman, aur, files, systemd`.** Writing a file that a not-yet-installed package owns would make pacman fail.
+- **Execution order is `pacman, aur, flatpak, files, systemd`.** Writing a file that a not-yet-installed package owns would make pacman fail.
 - **decman enables units, never starts them.** It only touches units that are, or were, declared.
 - **`on_change` also runs on the first run, together with `on_enable`.** Do not repeat work in both.
 - **Never manage `/boot/limine.conf`.** limine-mkinitcpio-hook generates it from `/etc/kernel/cmdline`, and limine-snapper-sync adds the snapshot entries. `limine-update` rewrites it, keeping global options, so add a global option with an idempotent edit in a hook (see `term_font_scale` in `framework_gab_amd.py`), never a `File`. Its checksum is not enrolled in the Limine binary: that only happens with `ENABLE_ENROLL_LIMINE_CONFIG=yes`, which is off by default (`enroll_config()` in `/usr/lib/limine/limine-common-functions`).

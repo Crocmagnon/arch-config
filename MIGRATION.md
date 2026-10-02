@@ -147,6 +147,7 @@ Le Arch Wiki bloque les lectures automatiques. Les pages KDE Wallet, Snapper et 
 | Fonctionnalité | Hôte | Cible | Arch | Note |
 |---|---|---|---|---|
 | `vim git ripgrep` | L+D | dm | idem | |
+| `man` | L+D | dm | `man-db man-pages`, `man-db.timer` | Ajouté le 28/09/2026 : absent de l'installation de base d'Arch. |
 | fuseau Europe/Paris, locale `en_US` + `LC_*=fr_FR`, clavier `fr` | L+D | ai + dm | `/etc/locale.conf`, `/etc/vconsole.conf`, `/etc/X11/xorg.conf.d/00-keyboard.conf` | |
 | fish comme shell de gaugendre | L+D | ai + dm | `fish` | root garde bash (config root abandonnée). |
 | sudo NOPASSWD | L+D | dm | `/etc/sudoers.d/gaugendre` (0440) | |
@@ -217,9 +218,9 @@ Le Arch Wiki bloque les lectures automatiques. Les pages KDE Wallet, Snapper et 
 
 | Module HM | Cible | État | À faire |
 |---|---|---|---|
-| git (`git.nix`) | cz | ≈ | Fusionner les alias HM (`statmain diffs restores prev next first pushf`) et ceux de dotfiles. `init.defaultBranch` main/master selon `work`. Sous `work` : git-town et `diff.tool = nvimdiff`. Paquets textconv : `git-lfs python-pygments pandoc-cli poppler perl-image-exiftool unzip`. |
-| Paquets de `home.nix` | dm / mise | ✗ | pacman : `git-crypt watchexec vscode-json-languageserver yaml-language-server htop btop` ; AUR ou mise : `tlrc-bin git-toolbelt amber-search-bin terraform-ls-bin`. prek est déjà dans mise. |
-| tmux, tldr-update, direnv, bash | ✗ | — | tlrc met son cache à jour tout seul. |
+| git (`git.nix`) | cz | ≈ | Fusionner les alias HM (`statmain diffs restores prev next first pushf`) et ceux de dotfiles. `init.defaultBranch` main/master selon `work`. Sous `work` : git-town et `diff.tool = nvimdiff`. Paquets : `git-lfs unzip`. Les convertisseurs textconv (`python-pygments pandoc-cli poppler perl-image-exiftool`) ont été retirés le 01/10/2026, avec leur config git dans dotfiles. |
+| Paquets de `home.nix` | dm / mise | ✗ | pacman : `git-crypt watchexec vscode-json-languageserver yaml-language-server htop btop` ; AUR ou mise : `git-toolbelt amber-search-bin terraform-ls-bin`. tldr : `tldr` (client Python, dépôt extra) à la place de `tlrc-bin` (AUR) depuis le 02/10/2026. prek est déjà dans mise. |
+| tmux, tldr-update, direnv, bash | ✗ | — | Le client `tldr` met son cache à jour tout seul (après 7 jours, `TLDR_CACHE_MAX_AGE`). |
 | gpg, gpg-agent | cz | ≈ | Voir §6. |
 | ssh (hôtes `srv-1` avec ControlMaster, `hass`) | cz | ≈ | Blocs perso sous `not work`, `XAuthLocation` (chemin macOS) sous `darwin`. `AddKeysToAgent yes` importe la clé dans gpg-agent au premier usage. |
 | fish (plugins, fonctions, greeting) | cz | ✓ | Supprimer `conf.d/fish_frozen_theme.fish` et l'ajouter à `.chezmoiremove` ; retirer `catppuccin/fish` de `fish_plugins`. Ajouter `~/.cargo/bin` au PATH. |
