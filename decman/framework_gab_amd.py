@@ -63,6 +63,8 @@ class FrameworkGabAmd(Module):
     # Aussi appelé au premier run.
     def on_change(self, store) -> None:
         # Menu Limine lisible : police doublée. limine-update relit limine.conf et garde ses options
-        # globales (vérifié le 28/09/2026), il suffit donc de l'ajouter une fois.
+        # globales (vérifié le 28/09/2026), il suffit donc de l'ajouter une fois. Sans ligne timeout:,
+        # sed n'insère rien sans erreur : le second grep fait alors échouer le hook.
         prg(["sh", "-c", "grep -q '^term_font_scale:' /boot/limine.conf"
-             " || sed -i '/^timeout:/i term_font_scale: 2x2' /boot/limine.conf"])
+             " || { sed -i '/^timeout:/i term_font_scale: 2x2' /boot/limine.conf"
+             " && grep -q '^term_font_scale:' /boot/limine.conf; }"])
