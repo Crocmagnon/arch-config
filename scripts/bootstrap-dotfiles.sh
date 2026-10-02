@@ -38,5 +38,8 @@ chezmoi init --promptBool "Machine du travail=false,Machine sans bureau (serveur
 chezmoi apply  # sans -v : les fichiers rendus contiennent des secrets
 # Shell de connexion : conf.d exporte le token GitHub, qui évite les limites de l'API.
 fish -lc 'mise install'
+# Second passage, outils mise dans le PATH : un script run_onchange sauté faute d'outil repasse,
+# car le chemin de l'outil entre dans son hash.
+mise exec -- chezmoi apply
 
 echo "Dotfiles appliqués. Redémarrer, puis suivre « Après la première connexion » dans le README."
