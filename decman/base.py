@@ -1,12 +1,8 @@
 # Ce qu'il faut sur toutes les machines, avec ou sans bureau.
-import decman
 from decman import File, Module, prg
 from decman.plugins import aur, pacman, systemd
 
 USER = "gaugendre"
-
-# /tmp est un tmpfs (moitié de la RAM) : trop petit pour certains builds AUR.
-decman.aur.build_dir = "/var/tmp/decman/build"
 
 
 class Base(Module):
@@ -26,6 +22,7 @@ class Base(Module):
             "openssh",
             # Ce qui doit exister avant mise et chezmoi.
             "fish", "fisher", "gnupg", "git-crypt", "chezmoi", "mise",
+            # Outils de base, aussi pour root.
             "vim", "ripgrep",
             "pacman-contrib",  # paccache.timer, l'équivalent de nix gc
             "man-db", "man-pages",
@@ -42,7 +39,7 @@ class Base(Module):
     def files(self) -> dict[str, File]:
         return {
             # Même chemin que celui d'archinstall, pour le remplacer plutôt que l'empiler.
-            "/etc/sudoers.d/00_gaugendre": File(
+            f"/etc/sudoers.d/00_{USER}": File(
                 content=f"{USER} ALL=(ALL) NOPASSWD: SETENV: ALL\n", permissions=0o440
             ),
             "/etc/locale.gen": File(source_file="./files/base/locale.gen"),
@@ -56,5 +53,7 @@ class Base(Module):
     def on_change(self, store) -> None:
         prg(["locale-gen"])
 
+    # usermod plutôt qu'un User() de UserManager : celui-ci alignerait aussi les groupes sur sa
+    # liste, et retirerait gaugendre de wheel et des groupes ajoutés dans source.py.
     def on_enable(self, store) -> None:
         prg(["usermod", "--shell", "/usr/bin/fish", USER])

@@ -32,7 +32,7 @@
             "status": "create",
             "type": "primary",
             "start": {"value": 1, "unit": "MiB", "sector_size": {"value": 512, "unit": "B"}},
-            "size": {"value": 4, "unit": "GiB", "sector_size": {"value": 512, "unit": "B"}},
+            "size": {"value": "@ESP_MIB@", "unit": "MiB", "sector_size": {"value": 512, "unit": "B"}},
             "fs_type": "fat32",
             "mountpoint": "/boot",
             "dev_path": null,
@@ -44,7 +44,7 @@
             "obj_id": "3d9a6e72-5b18-4c4f-8a21-0e7f9b3c6d02",
             "status": "create",
             "type": "primary",
-            "start": {"value": 4097, "unit": "MiB", "sector_size": {"value": 512, "unit": "B"}},
+            "start": {"value": "@ROOT_START_MIB@", "unit": "MiB", "sector_size": {"value": 512, "unit": "B"}},
             "size": {"value": "@ROOT_MIB@", "unit": "MiB", "sector_size": {"value": 512, "unit": "B"}},
             "fs_type": "btrfs",
             "mountpoint": null,
@@ -69,7 +69,7 @@
     }
   },
   "custom_commands": [
-    "set -e\ndev=$(cryptsetup status root | awk '$1 == \"device:\" {print $2}')\necho \"root UUID=$(blkid -s UUID -o value \"$dev\") none luks,discard,x-initrd.attach\" >> /etc/crypttab\necho 'HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block plymouth sd-encrypt filesystems fsck)' > /etc/mkinitcpio.conf.d/10-hooks.conf\nmkinitcpio -P",
+    "set -e\ndev=$(cryptsetup status root | awk '$1 == \"device:\" {print $2}')\necho \"root UUID=$(blkid -s UUID -o value \"$dev\") none luks,discard,x-initrd.attach\" >> /etc/crypttab\n# HOOKS : comme dans decman/boot.py, sans sd-btrfs-overlayfs (AUR, pas encore installé).\necho 'HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block plymouth sd-encrypt filesystems fsck)' > /etc/mkinitcpio.conf.d/10-hooks.conf\nmkinitcpio -P",
     "set -e\ncase \"$(cat /etc/hostname)\" in framework-gab*) ;; *) exit 0 ;; esac\nram=$(awk '/MemTotal/ {print int($2 / 1048576) + 1}' /proc/meminfo)\nbtrfs filesystem mkswapfile --size \"${ram}g\" --uuid clear /swap/swapfile\necho '/swap/swapfile none swap defaults 0 0' >> /etc/fstab"
   ]
 }

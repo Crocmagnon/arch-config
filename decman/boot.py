@@ -37,8 +37,9 @@ class Boot(Module):
         return {
             "/etc/kernel/cmdline": File(content=self.cmdline + "\n"),
             "/etc/default/limine": File(content="ESP_PATH=/boot\n"),
-            # Les HOOKS d'archinstall (custom_commands), plus sd-btrfs-overlayfs : un snapshot est en
-            # lecture seule, ce hook monte une couche temporaire en écriture par-dessus pour démarrer.
+            # Les HOOKS d'archinstall (custom_commands de user_configuration.json, à garder identiques),
+            # plus sd-btrfs-overlayfs : un snapshot est en lecture seule, ce hook monte une couche
+            # temporaire en écriture par-dessus pour démarrer. Il vient de l'AUR, d'où son absence là-bas.
             "/etc/mkinitcpio.conf.d/10-hooks.conf": File(content=(
                 "HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block plymouth"
                 " sd-encrypt filesystems sd-btrfs-overlayfs fsck)\n"
