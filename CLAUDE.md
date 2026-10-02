@@ -28,7 +28,7 @@ Test in the VM bench (`vm/README.md`) before touching real hardware: `vm/state.s
 
 - `decman/source.py`: entry point. Sets `decman.execution_order`, maps hostname to kernel params and modules, and refuses unknown hosts.
 - One module per concern (`base.py`, `boot.py`, …), then host modules. Files owned by a module live in `decman/files/<module>/`.
-- `archinstall/user_configuration.json` has placeholders (`@HOSTNAME@`, `@DEVICE@`, `"@ROOT_MIB@"`) filled by `render.sh`.
+- `archinstall/user_configuration.json` has placeholders (`@HOSTNAME@`, `@DEVICE@`, `"@ROOT_MIB@"`) filled by `render.sh`. Laptop hostnames start with `framework-gab`: its hibernation swapfile command matches that prefix.
 
 ## Rules and gotchas (all verified)
 
