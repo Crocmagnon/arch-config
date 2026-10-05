@@ -19,7 +19,6 @@ class Apps(Module):
             "git-lfs", "unzip", "bind", "jq", "watchexec", "htop", "btop", "clang",
             "vscode-json-languageserver", "yaml-language-server",
             "luarocks", "luacheck", "busted",  # outils Lua absents de mise (luajit, stylua, lua-language-server y sont)
-            "opencode",
             # Home Assistant dev tools
             "base-devel", "python", "python-pip", "python-virtualenv",
             "autoconf", "libxml2", "libxslt", "libjpeg-turbo", "libffi",
@@ -36,5 +35,4 @@ class Apps(Module):
             # les déclarer aussi les ferait réinstaller à chaque run (déjà là, mais pas explicites).
             "nrfconnect-appimage", "nrfutil",
             "git-toolbelt", "amber-search-bin", "fresh-editor-bin",
-            "crush-bin", "openai-codex-bin",
         }
