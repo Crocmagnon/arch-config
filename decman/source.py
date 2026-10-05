@@ -25,6 +25,9 @@ HOSTS = {
             "amdgpu.dcdebugmask=0x10",  # PSR (nixos-hardware)
             # pstore EFI, désactivé par défaut dans le noyau Arch : trace d'un blocage d'hibernation.
             "efi_pstore.pstore_disable=0",
+            # Fin du journal gardée à la panique : 10 Kio par défaut (compressés), trop court pour la
+            # pile des 12 cœurs. Chaque Kio prend une variable EFI : la NVRAM est petite, rester sobre.
+            "pstore.kmsg_bytes=20480",
         ),
         [Amd(), FrameworkGabAmd()],
     ),
