@@ -64,6 +64,7 @@
     ],
     "disk_encryption": {
       "encryption_type": "luks",
+      "iter_time": 2000,
       "partitions": ["3d9a6e72-5b18-4c4f-8a21-0e7f9b3c6d02"],
       "lvm_volumes": []
     }

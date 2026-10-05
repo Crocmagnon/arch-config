@@ -45,6 +45,7 @@ Test in the VM bench (`vm/README.md`) before touching real hardware: `vm/state.s
   - Sizes must be absolute, no `Percent`, hence `render.sh`.
   - The swap partition cannot be encrypted cleanly, hence a btrfs swapfile.
   - `custom_commands` run after the bootloader and before `genfstab`.
+- **LUKS `iter_time` is 2000 ms in `user_configuration.json`.** archinstall's default is 10000 ms (`--iter-time` on `luksFormat`), which makes argon2id take ~10 s at every unlock. Lower an existing keyslot with `cryptsetup luksConvertKey --iter-time 2000 --key-slot 0 <part>`.
 - **systemd-sleep hooks go in `/usr/lib/systemd/system-sleep/`.** `/etc/systemd/system-sleep/` only works on NixOS.
 - **Arch groups:** serial ports are `uucp`, not `dialout`, and libvirt is `libvirt`, not `libvirtd`.
 - **AUR builds run as `builduser`** (a system user). PGP keys for signed sources are received into its keyring by `GPGReceiver` in `source.py`, with one comment per key naming the package that needs it. The default `nobody` has no keyring, so any signed source fails.
