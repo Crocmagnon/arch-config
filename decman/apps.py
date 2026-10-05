@@ -21,8 +21,7 @@ class Apps(Module):
             "luarocks", "luacheck", "busted",  # outils Lua absents de mise (luajit, stylua, lua-language-server y sont)
             # Home Assistant dev tools
             "base-devel", "python", "python-pip", "python-virtualenv",
-            "autoconf", "libxml2", "libxslt", "libjpeg-turbo", "libffi",
-            "systemd", "zlib", "pkgconf", "ffmpeg", "gcc", "cmake"
+            "libxml2", "libxslt", "libjpeg-turbo", "libffi", "ffmpeg", "cmake"
         }
 
     @aur.packages
