@@ -1,6 +1,6 @@
 # Session Plasma et services système du bureau : tout ce qui ne dépend pas de la machine.
 from decman import File, Module, prg
-from decman.plugins import flatpak, pacman, systemd
+from decman.plugins import flatpak, pacman, systemd, aur
 
 from base import USER
 
@@ -23,12 +23,18 @@ class Desktop(Module):
             "qt6-multimedia-ffmpeg", "tesseract-data-eng", "tesseract-data-fra",
             "pipewire-alsa", "pipewire-pulse", "pipewire-jack", "wireplumber", "rtkit",  # jack : sinon pacman propose jack2
             "ttf-dejavu", "ttf-liberation", "noto-fonts", "noto-fonts-emoji",
-            "ttf-jetbrains-mono-nerd", "ttf-fira-sans", "ttf-montserrat",
+            "ttf-jetbrains-mono-nerd", "ttf-fira-sans", "ttf-montserrat", "ttf-opensans",
             "bluez", "bluez-utils", "cups", "fwupd",
             "docker", "tailscale", "ufw", "flatpak",
             "usbmuxd", "libimobiledevice", "ifuse",  # iPhone
             # VM (virt-manager) : dnsmasq pour le réseau NAT « default », swtpm pour un TPM virtuel
             "libvirt", "qemu-desktop", "virt-manager", "virtiofsd", "swtpm", "edk2-ovmf", "dnsmasq",
+        }
+
+    @aur.packages
+    def aur_packages(self) -> set[str]:
+        return {
+            "ttf-ms-fonts",
         }
 
     @flatpak.packages
