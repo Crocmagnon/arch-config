@@ -26,6 +26,9 @@ class Base(Module):
             "vim", "ripgrep",
             "pacman-contrib",  # paccache.timer, l'équivalent de nix gc
             "man-db", "man-pages",
+            # Garde les modules du noyau en cours après sa mise à jour (bridge pour docker…),
+            # linux-modules-cleanup.service les supprime au démarrage suivant.
+            "kernel-modules-hook",
         }
 
     @aur.packages
@@ -34,7 +37,8 @@ class Base(Module):
 
     @systemd.units
     def units(self) -> set[str]:
-        return {"NetworkManager.service", "paccache.timer", "man-db.timer"}
+        return {"NetworkManager.service", "paccache.timer", "man-db.timer",
+                "linux-modules-cleanup.service"}
 
     def files(self) -> dict[str, File]:
         return {
