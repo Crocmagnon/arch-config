@@ -61,3 +61,7 @@ class Base(Module):
     # liste, et retirerait gaugendre de wheel et des groupes ajoutés dans source.py.
     def on_enable(self, store) -> None:
         prg(["usermod", "--shell", "/usr/bin/fish", USER])
+
+    # Nom affiché (GECOS) : à chaque run, pour atteindre aussi les machines déjà installées.
+    def after_update(self, store) -> None:
+        prg(["usermod", "--comment", "Gabriel", USER])
