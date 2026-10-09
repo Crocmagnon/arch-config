@@ -40,7 +40,7 @@ class Desktop(Module):
     @flatpak.packages
     def flatpak_packages(self) -> set[str]:
         # La branche beta se pose à la main (README, « Après la première connexion ») : decman ne gère ni remotes ni branches.
-        return {"com.prusa3d.PrusaSlicer"}
+        return {"com.prusa3d.PrusaSlicer", "org.fkoehler.KTailctl"}
 
     @systemd.units
     def units(self) -> set[str]:
