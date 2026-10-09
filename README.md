@@ -59,7 +59,7 @@ Dans un terminal Plasma (pinentry-qt et le wallet ne sont là qu'en session grap
    ```
    Sauvegarder la clé GPG secrète (`gpg --armor --export-secret-keys`) et son certificat de révocation (`~/.gnupg/openpgp-revocs.d/`) dans Bitwarden. Publier les deux clés publiques sur Codeberg et GitHub, la clé SSH dans `modules/nixos/common/users.nix` (nixos-config, déployé sur srv-1) et sur `hass`. Passer ensuite les remotes de dotfiles et arch-config en SSH.
 2. Comptes et services :
-   - `tailscale up`, appairage KDE Connect ;
+   - `sudo tailscale up --operator=$USER --ssh --accept-routes --accept-dns`, appairage KDE Connect ;
    - connexions : Signal, pCloud, Steam, `claude` ; restauration du profil Thunderbird ;
    - `fprintd-enroll` (laptop) ;
    - `fwupdmgr refresh && fwupdmgr update` ;
