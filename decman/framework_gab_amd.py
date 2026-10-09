@@ -18,10 +18,6 @@ class FrameworkGabAmd(Module):
             "powertop", "acpi",  # mesure de la batterie
         }
 
-    @aur.packages
-    def aur_packages(self) -> set[str]:
-        return {"powerstat"}
-
     @systemd.units
     def units(self) -> set[str]:
         return {

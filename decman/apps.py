@@ -27,11 +27,8 @@ class Apps(Module):
     @aur.packages
     def aur_packages(self) -> set[str]:
         return {
-            "rustdesk-bin", "pcloud-drive", "koreader-bin", "claude-code",
+            "rustdesk-bin", "pcloud-drive", "claude-code",
             "openscad-git",  # version de développement (manifold) ; recompilée seulement avec
                              # sudo decman --params aur-upgrade-devel
-            # Suite Nordic nRF. nrf-udev et jlink-software-and-documentation en sont des dépendances :
-            # les déclarer aussi les ferait réinstaller à chaque run (déjà là, mais pas explicites).
-            "nrfconnect-appimage", "nrfutil",
-            "git-toolbelt", "amber-search-bin", "fresh-editor-bin",
+            "nrfconnect-appimage", "git-toolbelt", "fresh-editor-bin",
         }
