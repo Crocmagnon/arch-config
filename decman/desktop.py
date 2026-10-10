@@ -25,7 +25,7 @@ class Desktop(Module):
             "ttf-dejavu", "ttf-liberation", "noto-fonts", "noto-fonts-emoji",
             "ttf-jetbrains-mono-nerd", "ttf-fira-sans", "ttf-montserrat", "ttf-opensans",
             "bluez", "bluez-utils", "cups", "fwupd",
-            "docker", "tailscale", "ufw", "flatpak",
+            "docker", "docker-buildx", "tailscale", "ufw", "flatpak",
             "usbmuxd", "libimobiledevice", "ifuse",  # iPhone
             # VM (virt-manager) : dnsmasq pour le réseau NAT « default », swtpm pour un TPM virtuel
             "libvirt", "qemu-desktop", "virt-manager", "virtiofsd", "swtpm", "edk2-ovmf", "dnsmasq",
