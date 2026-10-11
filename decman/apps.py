@@ -11,12 +11,12 @@ class Apps(Module):
     @pacman.packages
     def pacman_packages(self) -> set[str]:
         return {
-            "firefox", "chromium", "signal-desktop", "thunderbird",
+            "firefox", "chromium", "signal-desktop", "telegram-desktop", "thunderbird",
             "freecad", "graphviz",  # graphviz : graphe des dépendances dans FreeCAD
             "libreoffice-still", "calibre", "tldr",
             "steam",  # dépôt multilib, activé par archinstall ; pilote Vulkan dans le module du GPU
             "fuse2",  # AppImages (Rotatrix, nRF Connect)
-            "git-lfs", "unzip", "bind", "jq", "watchexec", "htop", "btop", "clang",
+            "git-lfs", "unzip", "bind", "jq", "age", "watchexec", "htop", "btop", "clang",
             "vscode-json-languageserver", "yaml-language-server",
             "luarocks", "luacheck", "busted",  # outils Lua absents de mise (luajit, stylua, lua-language-server y sont)
             # Home Assistant dev tools
