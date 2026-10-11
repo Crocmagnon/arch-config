@@ -1,7 +1,7 @@
 # Applications et outils en ligne de commande communs aux machines de bureau. Les outils de dev
 # qui existent dans mise (go, node, uv, lua, rust, terraform…) passent par mise, pas par ici.
-from decman import Module
-from decman.plugins import aur, pacman
+from decman import File, Module
+from decman.plugins import aur, pacman, systemd
 
 
 class Apps(Module):
@@ -19,6 +19,7 @@ class Apps(Module):
             "git-lfs", "unzip", "bind", "jq", "age", "watchexec", "htop", "btop", "clang",
             "vscode-json-languageserver", "yaml-language-server",
             "luarocks", "luacheck", "busted",  # outils Lua absents de mise (luajit, stylua, lua-language-server y sont)
+            "nix",  # flakes des repos qui en ont un (downloader-go)
             # Home Assistant dev tools
             "base-devel", "python", "python-pip", "python-virtualenv",
             "libxml2", "libxslt", "libjpeg-turbo", "libffi", "ffmpeg", "cmake"
@@ -31,4 +32,18 @@ class Apps(Module):
             "openscad-git",  # version de développement (manifold) ; recompilée seulement avec
                              # sudo decman --params aur-upgrade-devel
             "nrfconnect-appimage", "git-toolbelt", "fresh-editor-bin",
+        }
+
+    @systemd.units
+    def units(self) -> set[str]:
+        return {"nix-daemon.socket"}  # le daemon démarre au premier appel
+
+    def files(self) -> dict[str, File]:
+        return {
+            # Possédé par le paquet nix : après une mise à jour, fusionner le .pacnew.
+            "/etc/nix/nix.conf": File(content=(
+                "build-users-group = nixbld\n"
+                "experimental-features = nix-command flakes\n"
+                "max-jobs = auto\n"
+            )),
         }

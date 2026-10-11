@@ -115,6 +115,7 @@ Dans le menu Limine, ouvrir **Snapshots**, puis un snapshot, puis son entrée `l
 
 - `openscad-git` n'est recompilé qu'avec `sudo decman --params aur-upgrade-devel`.
 - Après une mise à jour de ufw, fusionner le `.pacnew` de `/etc/ufw/sysctl.conf` (decman le gère avec `rp_filter=2`).
+- Après une mise à jour de nix, fusionner le `.pacnew` de `/etc/nix/nix.conf` (decman le gère pour activer les flakes).
 - Plus tard, en option : Secure Boot (`sbctl create-keys`, `enroll-keys -m`, signer l'EFI de Limine, puis `limine enroll-config`).
 
 ## Tester
