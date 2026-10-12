@@ -92,7 +92,7 @@ vm/state.sh list
 
 1. ISO, puis §3. Dans la VM :
    ```sh
-   arch-config/archinstall/render.sh framework-gab-amd /dev/vda > c.json   # ou desktop-gab
+   arch-config/archinstall/render.sh framework-gab /dev/vda > c.json   # ou desktop-gab
    archinstall --config c.json --creds creds.json --silent
    ```
    `creds.json` est local et n'est pas versionné. Pour la VM, on met `test` partout (LUKS, gaugendre, root) : ce mot s'écrit pareil en qwerty et en azerty.

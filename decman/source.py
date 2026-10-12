@@ -12,7 +12,8 @@ from amd import Amd
 from apps import Apps
 from boot import Boot
 from desktop import Desktop
-from framework_gab_amd import FrameworkGabAmd
+from framework_gab import FrameworkGab
+from intel import Intel
 
 # Un fichier /etc appartenant à un paquet pas encore installé ferait échouer pacman
 # (« existe déjà dans le système de fichiers ») : on installe d'abord, on écrit ensuite.
@@ -20,17 +21,7 @@ decman.execution_order = ["pacman", "aur", "flatpak", "files", "systemd"]
 
 # Par hôte : paramètres noyau en plus de ceux de boot.py, et modules propres.
 HOSTS = {
-    "framework-gab-amd": (
-        (
-            "amdgpu.dcdebugmask=0x10",  # PSR (nixos-hardware)
-            # pstore EFI, désactivé par défaut dans le noyau Arch : trace d'un blocage d'hibernation.
-            "efi_pstore.pstore_disable=0",
-            # Fin du journal gardée à la panique : 10 Kio par défaut (compressés), trop court pour la
-            # pile des 12 cœurs. Chaque Kio prend une variable EFI : la NVRAM est petite, rester sobre.
-            "pstore.kmsg_bytes=20480",
-        ),
-        [Amd(), FrameworkGabAmd()],
-    ),
+    "framework-gab": ((), [Intel(), FrameworkGab()]),
     "desktop-gab": (
         ('acpi_osi="!Windows 2015"',),  # veille sur la B650 (nixos-hardware)
         [Amd()],

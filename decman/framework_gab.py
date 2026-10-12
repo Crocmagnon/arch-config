@@ -1,13 +1,13 @@
-# Framework 13 AMD (Ryzen AI 300) : hibernation, empreinte, KVM, cartes d'extension.
+# Framework 13 Pro Intel : hibernation, empreinte, KVM, cartes d'extension.
 from decman import File, Module, prg
 from decman.plugins import aur, pacman, systemd
 
-FILES = "./files/framework-gab-amd"
+FILES = "./files/framework-gab"
 
 
-class FrameworkGabAmd(Module):
+class FrameworkGab(Module):
     def __init__(self) -> None:
-        super().__init__("framework-gab-amd")
+        super().__init__("framework-gab")
 
     @pacman.packages
     def pacman_packages(self) -> set[str]:
@@ -22,8 +22,6 @@ class FrameworkGabAmd(Module):
     def units(self) -> set[str]:
         return {
             "power-profiles-daemon.service",
-            # Copie les traces pstore dans /var/lib/systemd/pstore et libère les variables EFI.
-            "systemd-pstore.service",
         }
 
     def files(self) -> dict[str, File]:
@@ -31,8 +29,8 @@ class FrameworkGabAmd(Module):
             # Veille, puis hibernation au bout d'une heure (déclenchée par powerdevil, SleepMode=3).
             # Reprise sans resume= : l'initramfs systemd lit la variable EFI HibernateLocation.
             # HibernateMode=shutdown : écrire l'image puis s'éteindre, sans entrer en ACPI S4. En S4,
-            # ce laptop se rallume tout seul au bout de quelques secondes (constaté sous NixOS, puis
-            # sous Arch le 28/09/2026).
+            # le Framework 13 AMD se rallumait tout seul au bout de quelques secondes (constaté sous
+            # NixOS, puis sous Arch le 28/09/2026) ; pas encore essayé sur ce modèle.
             "/etc/systemd/sleep.conf.d/hibernate.conf": File(
                 content="[Sleep]\nHibernateDelaySec=60min\nHibernateMode=shutdown\n"
             ),
@@ -41,18 +39,10 @@ class FrameworkGabAmd(Module):
             "/usr/lib/systemd/system-sleep/unlock-after-hibernate": File(
                 source_file=f"{FILES}/unlock-after-hibernate", permissions=0o755
             ),
-            # Panique sur blocage pendant la veille et l'hibernation, pour garder une trace (pstore).
-            "/usr/lib/systemd/system-sleep/panic-on-hang": File(
-                source_file=f"{FILES}/panic-on-hang", permissions=0o755
-            ),
             # Clavier et souris derrière le KVM : réveil par USB (le KVM rattache le hub à chaque
             # bascule, un réglage ponctuel ne survivrait pas).
             "/etc/udev/rules.d/90-usb-wakeup.rules": File(
                 content='ACTION=="add", SUBSYSTEM=="usb", DRIVER=="usb", TEST=="power/wakeup", ATTR{power/wakeup}="enabled"\n'
-            ),
-            # Le BIOS déclare à tort le périphérique ACP, d'où une interface audio fantôme (nixos-hardware).
-            "/etc/modprobe.d/framework-acp.conf": File(
-                content="blacklist snd_acp70\nblacklist snd_acp_pci\n"
             ),
         }
 

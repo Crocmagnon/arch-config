@@ -1,6 +1,6 @@
 #!/bin/sh
 # Rend user_configuration.json pour un hôte et un disque, sur stdout.
-#   render.sh framework-gab-amd /dev/nvme0n1 > /root/config.json
+#   render.sh framework-gab /dev/nvme0n1 > /root/config.json
 # L'ESP commence à 1 MiB ; la racine prend tout le disque après elle, moins 1 MiB pour la GPT de
 # secours : archinstall n'accepte que des tailles absolues.
 set -eu

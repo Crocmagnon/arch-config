@@ -4,7 +4,7 @@ Guidance for Claude Code in this repository. Keep it and `README.md` current: up
 
 ## What this is
 
-Declarative Arch Linux config for the user's desktops (`framework-gab-amd`, `desktop-gab`, later `framework-gab`):
+Declarative Arch Linux config for the user's desktops (`framework-gab`, a Framework 13 Pro Intel, and `desktop-gab`):
 - archinstall for disk and boot;
 - decman for system packages, `/etc` files, systemd units and snapshots;
 - user files live in the separate chezmoi `dotfiles` repo.
@@ -37,7 +37,7 @@ Test in the VM bench (`vm/README.md`) before touching real hardware: `vm/state.s
 - **Execution order is `pacman, aur, flatpak, files, systemd`.** Writing a file that a not-yet-installed package owns would make pacman fail.
 - **decman enables units, never starts them.** It only touches units that are, or were, declared.
 - **`on_change` also runs on the first run, together with `on_enable`.** Do not repeat work in both.
-- **Never manage `/boot/limine.conf`.** limine-mkinitcpio-hook generates it from `/etc/kernel/cmdline`, and limine-snapper-sync adds the snapshot entries. `limine-update` rewrites it, keeping global options, so add a global option with an idempotent edit in a hook (see `term_font_scale` in `framework_gab_amd.py`), never a `File`. Its checksum is not enrolled in the Limine binary: that only happens with `ENABLE_ENROLL_LIMINE_CONFIG=yes`, which is off by default (`enroll_config()` in `/usr/lib/limine/limine-common-functions`).
+- **Never manage `/boot/limine.conf`.** limine-mkinitcpio-hook generates it from `/etc/kernel/cmdline`, and limine-snapper-sync adds the snapshot entries. `limine-update` rewrites it, keeping global options, so add a global option with an idempotent edit in a hook (see `term_font_scale` in `framework_gab.py`), never a `File`. Its checksum is not enrolled in the Limine binary: that only happens with `ENABLE_ENROLL_LIMINE_CONFIG=yes`, which is off by default (`enroll_config()` in `/usr/lib/limine/limine-common-functions`).
 - **Initramfs hooks live in `/etc/mkinitcpio.conf.d/10-hooks.conf`.** archinstall writes it, and `boot.py` takes it over and adds `sd-btrfs-overlayfs`, which is required to boot a read-only snapshot and only exists once the AUR package is installed.
 - **The LUKS root is in `/etc/crypttab` with `x-initrd.attach`.** `crypttab.initramfs` is deprecated in mkinitcpio 42. UUIDs are per install and never go in git.
 - **archinstall 4.4 bugs and limits:**
@@ -50,7 +50,7 @@ Test in the VM bench (`vm/README.md`) before touching real hardware: `vm/state.s
 - **Arch groups:** serial ports are `uucp`, not `dialout`, and libvirt is `libvirt`, not `libvirtd`.
 - **AUR builds run as `builduser`** (a system user). PGP keys for signed sources are received into its keyring by `GPGReceiver` in `source.py`, with one comment per key naming the package that needs it. The default `nobody` has no keyring, so any signed source fails.
 - **Never declare a package that another declared AUR package already pulls in** (for example `nrf-udev`, a dependency of `nrfconnect-appimage`). The AUR step installs it as a dependency, and every later run tries to install it again.
-- **Declare the provider whenever pacman would ask which package provides a virtual dependency.** Otherwise real installs prompt, and the default can be wrong: for `tessdata`, the default is Afrikaans. Declared so far: `pipewire-jack`, `qt6-multimedia-ffmpeg`, `tesseract-data-eng`, `tesseract-data-fra`, `vulkan-radeon`, `lib32-vulkan-radeon`; and, declared for themselves but providers too, so keep them: `mkinitcpio` (`initramfs`), `wireplumber` (`pipewire-session-manager`), `pipewire-pulse` (`pulse-native-provider`), `noto-fonts` (`ttf-font`). After a VM run, list the prompts with `grep -a -A3 "providers available"` on the log.
+- **Declare the provider whenever pacman would ask which package provides a virtual dependency.** Otherwise real installs prompt, and the default can be wrong: for `tessdata`, the default is Afrikaans. Declared so far: `pipewire-jack`, `qt6-multimedia-ffmpeg`, `tesseract-data-eng`, `tesseract-data-fra`, `vulkan-radeon`, `lib32-vulkan-radeon`, `vulkan-intel`, `lib32-vulkan-intel`; and, declared for themselves but providers too, so keep them: `mkinitcpio` (`initramfs`), `wireplumber` (`pipewire-session-manager`), `pipewire-pulse` (`pulse-native-provider`), `noto-fonts` (`ttf-font`). After a VM run, list the prompts with `grep -a -A3 "providers available"` on the log.
 - **Flatpak needs two runs.** The decman flatpak plugin is probed at startup, before pacman installs `flatpak`, so the first run skips it with a warning.
 - **The autologin wallet is served by `ksecretd`** (KWallet 6), which owns `org.freedesktop.secrets` and is unlocked by PAM. Check it with the Secret Service `Locked` property of `/org/freedesktop/secrets/collection/kdewallet`. The legacy `org.kde.kwalletd6` name is a separate process that reports the wallet closed; whether apps using it re-prompt is still to be checked.
 - **ufw overrides sysctl at start with `/etc/ufw/sysctl.conf`**, which sets `rp_filter=1` (strict) and breaks the Tailscale exit node. decman owns that file with `rp_filter=2`. After a ufw upgrade, merge the `.pacnew`.

@@ -1,9 +1,8 @@
 # arch-config
 
 Configuration déclarative d'Arch Linux pour mes machines de bureau :
-- **framework-gab-amd** : Framework 13 AMD ;
-- **desktop-gab** : desktop AMD, carte mère Gigabyte B650 ;
-- plus tard, **framework-gab** : Framework 13 Pro Intel.
+- **framework-gab** : Framework 13 Pro Intel ;
+- **desktop-gab** : desktop AMD, carte mère Gigabyte B650.
 
 Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config, Plasma, thèmes) vit dans le dépôt [dotfiles](https://codeberg.org/Crocmagnon/dotfiles) et s'applique avec chezmoi.
 
@@ -15,14 +14,26 @@ Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config,
 
 Pour savoir où va une chose : ce qui demande root ou ne concerne qu'Arch va ici (paquets, `/etc`, unités système, udev, groupes), ainsi que les outils nécessaires avant chezmoi et mise. Tout ce qui vit sous `$HOME` va dans dotfiles, y compris les unités utilisateur et les réglages Plasma. dotfiles sert aussi les machines du travail (Ubuntu, Debian). Un outil en ligne de commande utile partout vient donc de mise, dans dotfiles. Un outil propre à Arch, ou que mise ne sait pas installer, vient de pacman, ici.
 
-> **État (28/09/2026).** Migration depuis NixOS terminée : le laptop `framework-gab-amd` et le desktop `desktop-gab` tournent sous Arch avec cette config. Vérifié sur le matériel : sur le laptop, l'hibernation, l'empreinte et le réveil par le KVM ; sur le desktop, l'écran DisplayPort à l'invite LUKS (y compris allumé après coup) et la veille ; sur les deux, l'exit node Tailscale. Chaque machine perso a ses propres clés SSH et GPG. srv-1 reste sous NixOS et se déploie depuis lui-même (`mise run srv-1` dans nixos-config). Le futur Framework 13 Pro (`framework-gab`) aura son module d'hôte : `intel-ucode vulkan-intel lib32-vulkan-intel intel-media-driver` à la place du module `amd`, et l'hibernation, le KVM et l'empreinte du laptop actuel. L'inventaire et les décisions de la migration sont dans l'historique git (`git log -- MIGRATION.md`).
+> **État (28/09/2026).** Migration depuis NixOS terminée : le laptop `framework-gab-amd` et le desktop `desktop-gab` tournent sous Arch avec cette config. Vérifié sur le matériel : sur le laptop, l'hibernation, l'empreinte et le réveil par le KVM ; sur le desktop, l'écran DisplayPort à l'invite LUKS (y compris allumé après coup) et la veille ; sur les deux, l'exit node Tailscale. Chaque machine perso a ses propres clés SSH et GPG. srv-1 reste sous NixOS et se déploie depuis lui-même (`mise run srv-1` dans nixos-config). Le Framework 13 AMD a laissé place au Framework 13 Pro Intel (`framework-gab`, 12/10/2026). Son module reprend l'hibernation, le KVM et l'empreinte de l'ancien laptop, à vérifier sur le nouveau matériel. L'inventaire et les décisions de la migration sont dans l'historique git (`git log -- MIGRATION.md`).
 
 ## Installer une machine
 
-1. Démarrer sur l'ISO Arch.
-2. Récupérer ce dépôt, puis générer la configuration pour l'hôte et son disque :
+1. Préparer la clé USB avec l'ISO officielle (sous fish comme sous bash) :
    ```sh
-   archinstall/render.sh framework-gab-amd /dev/nvme0n1 > config.json
+   curl -LO https://geo.mirror.pkgbuild.com/iso/latest/archlinux-x86_64.iso
+   curl -LO https://geo.mirror.pkgbuild.com/iso/latest/archlinux-x86_64.iso.sig
+   curl -LO https://geo.mirror.pkgbuild.com/iso/latest/b2sums.txt
+   pacman-key -v archlinux-x86_64.iso.sig && b2sum -c b2sums.txt --ignore-missing
+   lsblk -o NAME,SIZE,MODEL,TRAN    # repérer la clé (TRAN=usb)
+   sudo dd if=archlinux-x86_64.iso of=/dev/sdX bs=4M oflag=direct conv=fsync status=progress
+   ```
+   Sur un Framework, désactiver Secure Boot dans le BIOS (F2) : l'ISO n'est pas signée. Démarrer sur la clé (F12).
+2. Sur l'ISO, se connecter au réseau, récupérer ce dépôt, puis générer la configuration pour l'hôte et son disque :
+   ```sh
+   loadkeys fr
+   iwctl station wlan0 connect <SSID>
+   pacman -Sy git && git clone https://codeberg.org/Crocmagnon/arch-config && cd arch-config
+   archinstall/render.sh framework-gab /dev/nvme0n1 > config.json
    ```
 3. Écrire un `creds.json` local, **jamais versionné** :
    ```json
@@ -95,14 +106,13 @@ Ses `custom_commands` font deux choses :
   - Audio, Bluetooth, impression, Docker, Tailscale, iPhone, VM (libvirt et virt-manager).
   - ufw (entrée refusée, sauf KDE Connect et le réseau NAT de libvirt ; ports Docker publiés sur localhost seulement, `-p 0.0.0.0:…` pour les ouvrir au LAN ; `rp_filter` lâche pour l'exit node Tailscale), Flatpak (PrusaSlicer).
 - `apps.py` : les applications (Firefox, Chromium, Signal, Thunderbird, FreeCAD, LibreOffice, calibre, Steam, openscad-git, suite Nordic nRF…) et les outils en ligne de commande qui ne viennent pas de mise.
-- `amd.py` : le microcode et les pilotes Vulkan pour les machines AMD.
+- `amd.py` (desktop) et `intel.py` (laptop) : le microcode et les pilotes Vulkan, plus le décodage vidéo VA-API côté Intel.
 - Les paquets AUR se compilent sous l'utilisateur système `builduser`. Les clés PGP des sources signées lui sont fournies par `source.py`.
 - `/etc/makepkg.conf.d/parallel.conf` fait compiler sur tous les cœurs (makepkg n'en utilise qu'un par défaut).
-- `framework_gab_amd.py` (laptop) :
+- `framework_gab.py` (laptop) :
   - l'hibernation (veille, puis hibernation au bout d'une heure) et la levée du verrouillage de Plasma après une hibernation de plus de 5 min ;
-  - une trace en cas de blocage pendant la veille ou l'hibernation : panique, trace dans pstore (EFI), archivée dans `/var/lib/systemd/pstore` au démarrage suivant ;
   - l'empreinte digitale au verrouillage de l'écran, les profils d'énergie ;
-  - le réveil par le clavier derrière le KVM, la blacklist audio du BIOS ;
+  - le réveil par le clavier derrière le KVM ;
   - les outils de mesure de la batterie ;
   - pour l'écran dense : la police du menu Limine doublée.
 - `source.py` associe chaque hôte à ses paramètres noyau et à ses modules. desktop-gab n'a pas de module propre : juste `acpi_osi` pour la veille. Il ajoute aussi l'utilisateur aux groupes `docker`, `uucp` (ports série), `input` et `libvirt`.

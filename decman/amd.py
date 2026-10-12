@@ -1,4 +1,4 @@
-# Processeur et GPU AMD (framework-gab-amd, desktop-gab).
+# Processeur et GPU AMD (desktop-gab).
 from decman import Module
 from decman.plugins import pacman
 
