@@ -15,7 +15,8 @@ The NixOS → Arch migration is done. Its inventory and decisions live in git hi
 
 ```sh
 archinstall/render.sh <hostname> <disk> > config.json      # on the ISO
-archinstall --config config.json --creds creds.json --silent
+archinstall/creds.sh                                       # asks the password, writes archinstall/creds.json
+archinstall --config config.json --creds archinstall/creds.json --silent
 sudo decman --source decman/source.py --dry-run --debug     # always first
 sudo decman --source decman/source.py                       # first real run: remembers the path
 sudo decman                                                 # later runs (dry-run never stores it)

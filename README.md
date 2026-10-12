@@ -35,14 +35,10 @@ Pour savoir où va une chose : ce qui demande root ou ne concerne qu'Arch va ici
    pacman -Sy git && git clone https://codeberg.org/Crocmagnon/arch-config && cd arch-config
    archinstall/render.sh framework-gab /dev/nvme0n1 > config.json
    ```
-3. Écrire un `creds.json` local, **jamais versionné** :
-   ```json
-   {"encryption_password": "…", "root_enc_password": "<hash>", "users": [{"username": "gaugendre", "enc_password": "<hash>", "sudo": true}]}
-   ```
-   Les hash s'obtiennent avec `openssl passwd -6`. Mettre le même mot de passe pour LUKS et pour `gaugendre`, c'est ce qui permet au wallet KDE de s'ouvrir à l'autologin.
+3. Écrire `archinstall/creds.json`, ignoré par git : `archinstall/creds.sh` demande un mot de passe et le met pour LUKS, `gaugendre` et root. Le même pour LUKS et `gaugendre`, c'est ce qui permet au wallet KDE de s'ouvrir à l'autologin.
 4. Lancer l'installation, puis redémarrer :
    ```sh
-   archinstall --config config.json --creds creds.json --silent
+   archinstall --config config.json --creds archinstall/creds.json --silent
    ```
 5. Se connecter en `gaugendre` sur un TTY, se connecter au réseau (`nmcli device wifi connect <SSID> --ask`), cloner ce dépôt, puis installer decman depuis l'AUR, à la main pour cette seule fois :
    ```sh

@@ -93,9 +93,10 @@ vm/state.sh list
 1. ISO, puis §3. Dans la VM :
    ```sh
    arch-config/archinstall/render.sh framework-gab /dev/vda > c.json   # ou desktop-gab
-   archinstall --config c.json --creds creds.json --silent
+   arch-config/archinstall/creds.sh   # test
+   archinstall --config c.json --creds arch-config/archinstall/creds.json --silent
    ```
-   `creds.json` est local et n'est pas versionné. Pour la VM, on met `test` partout (LUKS, gaugendre, root) : ce mot s'écrit pareil en qwerty et en azerty.
+   `creds.json` est ignoré par git. Pour la VM, on met `test` partout (LUKS, gaugendre, root) : ce mot s'écrit pareil en qwerty et en azerty.
 2. **VM seulement**, avant de redémarrer, sinon le système installé n'a pas de serveur SSH :
    ```sh
    arch-chroot /mnt pacman -S --noconfirm openssh
