@@ -14,7 +14,7 @@ Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config,
 
 Pour savoir où va une chose : ce qui demande root ou ne concerne qu'Arch va ici (paquets, `/etc`, unités système, udev, groupes), ainsi que les outils nécessaires avant chezmoi et mise. Tout ce qui vit sous `$HOME` va dans dotfiles, y compris les unités utilisateur et les réglages Plasma. dotfiles sert aussi les machines du travail (Ubuntu, Debian). Un outil en ligne de commande utile partout vient donc de mise, dans dotfiles. Un outil propre à Arch, ou que mise ne sait pas installer, vient de pacman, ici.
 
-> **État (28/09/2026).** Migration depuis NixOS terminée : le laptop `framework-gab-amd` et le desktop `desktop-gab` tournent sous Arch avec cette config. Vérifié sur le matériel : sur le laptop, l'hibernation, l'empreinte et le réveil par le KVM ; sur le desktop, l'écran DisplayPort à l'invite LUKS (y compris allumé après coup) et la veille ; sur les deux, l'exit node Tailscale. Chaque machine perso a ses propres clés SSH et GPG. srv-1 reste sous NixOS et se déploie depuis lui-même (`mise run srv-1` dans nixos-config). Le Framework 13 AMD a laissé place au Framework 13 Pro Intel (`framework-gab`, 12/10/2026). Son module reprend l'hibernation, le KVM et l'empreinte de l'ancien laptop. L'hibernation (une fois coupé le port de la webcam qui réveillait la machine) et l'empreinte y sont vérifiées (14/10/2026) ; le KVM reste à vérifier. L'inventaire et les décisions de la migration sont dans l'historique git (`git log -- MIGRATION.md`).
+> **État (28/09/2026).** Migration depuis NixOS terminée : le laptop `framework-gab-amd` et le desktop `desktop-gab` tournent sous Arch avec cette config. Vérifié sur le matériel : sur le laptop, l'hibernation, l'empreinte et le réveil par le KVM ; sur le desktop, l'écran DisplayPort à l'invite LUKS (y compris allumé après coup) et la veille ; sur les deux, l'exit node Tailscale. Chaque machine perso a ses propres clés SSH et GPG. srv-1 reste sous NixOS et se déploie depuis lui-même (`mise run srv-1` dans nixos-config). Le Framework 13 AMD a laissé place au Framework 13 Pro Intel (`framework-gab`, 12/10/2026). Son module reprend l'hibernation, le KVM et l'empreinte de l'ancien laptop. Y sont vérifiés (14/10/2026) : l'hibernation (une fois coupé le port de la webcam qui réveillait la machine), l'empreinte et les pilotes Intel (Vulkan, VA-API) ; le réveil par le KVM reste à vérifier. L'inventaire et les décisions de la migration sont dans l'historique git (`git log -- MIGRATION.md`).
 
 ## Installer une machine
 
@@ -48,11 +48,16 @@ Pour savoir où va une chose : ce qui demande root ou ne concerne qu'Arch va ici
    ```
    Le premier run n'installe pas les Flatpak : le plugin Flatpak de decman est chargé au démarrage, avant que pacman n'installe `flatpak`. Un second `sudo decman` s'en charge. Le `--dry-run` doit n'enlever aucun paquet utile. Comparer sa sortie avec `pacman -Qqe`. Le chemin de la source n'est mémorisé qu'au premier vrai run : ce run-là prend donc aussi `--source`, et les suivants s'en passent.
 
-6. Toujours sur le TTY, avant la première session graphique (les raccourcis Plasma ne sont relus qu'à la connexion), appliquer les dotfiles :
+6. Avant la première session graphique (les raccourcis Plasma ne sont relus qu'à la connexion), appliquer les dotfiles. Pour coller la clé depuis une autre machine plutôt que dans le TTY, joindre d'abord le tailnet depuis le TTY (`--qr` : un QR code à scanner au téléphone, pas d'URL à recopier) :
+   ```sh
+   sudo systemctl start tailscaled     # decman active l'unité sans la démarrer
+   sudo tailscale up --operator=$USER --ssh --accept-routes --accept-dns --qr
+   ```
+   Puis, depuis une machine du tailnet, `ssh gaugendre@<hôte>` et :
    ```sh
    scripts/bootstrap-dotfiles.sh
    ```
-   Il clone dotfiles en HTTPS, le déverrouille avec la clé git-crypt collée en base64 depuis Bitwarden, répond « travail non », puis lance `chezmoi apply`, `mise install` et un second `chezmoi apply` pour les scripts qui attendaient un outil de mise. Relançable sans risque. Puis redémarrer.
+   Il clone dotfiles en HTTPS, le déverrouille avec la clé git-crypt collée en base64 depuis l'entrée Bitwarden « git-crypt dotfiles chezmoi base64 », répond « travail non », puis lance `chezmoi apply`, `mise install` et un second `chezmoi apply` pour les scripts qui attendaient un outil de mise. Relançable sans risque. Puis redémarrer.
 
 ## Après la première connexion
 
@@ -66,7 +71,7 @@ Dans un terminal Plasma (pinentry-qt et le wallet ne sont là qu'en session grap
    ```
    Sauvegarder la clé GPG secrète (`gpg --armor --export-secret-keys`) et son certificat de révocation (`~/.gnupg/openpgp-revocs.d/`) dans Bitwarden. Publier les deux clés publiques sur Codeberg et GitHub, la clé SSH dans `modules/nixos/common/users.nix` (nixos-config, déployé sur srv-1) et sur `hass`. Passer ensuite les remotes de dotfiles et arch-config en SSH.
 2. Comptes et services :
-   - `sudo tailscale up --operator=$USER --ssh --accept-routes --accept-dns`, appairage KDE Connect ;
+   - `sudo tailscale up --operator=$USER --ssh --accept-routes --accept-dns` si ce n'est pas fait à l'étape 6, appairage KDE Connect ;
    - connexions : Signal, pCloud, Steam, `claude` ; restauration du profil Thunderbird ;
    - `fprintd-enroll` (laptop) ;
    - `fwupdmgr refresh && fwupdmgr update` ;

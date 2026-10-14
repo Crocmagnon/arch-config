@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Amorce les dotfiles (chezmoi) sur une machine perso fraîchement installée, juste après decman.
-# À lancer depuis le TTY, avant la première session Plasma : kglobalacceld ne relit pas ses
-# raccourcis, ils doivent être écrits avant la connexion. Relançable : une étape déjà faite est
-# sautée.
+# À lancer depuis le TTY ou par Tailscale SSH, avant la première session Plasma : kglobalacceld
+# ne relit pas ses raccourcis, ils doivent être écrits avant la connexion. Relançable : une étape
+# déjà faite est sautée.
 #
 #   scripts/bootstrap-dotfiles.sh
 set -euo pipefail
@@ -21,12 +21,13 @@ fi
 
 [ -d "$src/.git" ] || git clone "$repo" "$src"
 
-# La clé vient du gestionnaire de mots de passe, en base64 (git-crypt export-key produit un
-# binaire). Elle ne passe que par la RAM ($XDG_RUNTIME_DIR) et est effacée même en cas d'erreur.
+# La clé vient de Bitwarden (« git-crypt dotfiles chezmoi base64 »), en base64 : git-crypt
+# export-key produit un binaire. Elle ne passe que par la RAM ($XDG_RUNTIME_DIR) et est effacée
+# même en cas d'erreur.
 if [ ! -e "$src/.git/git-crypt/keys/default" ]; then
     key=$(mktemp -p "${XDG_RUNTIME_DIR:?}")
     trap 'shred -u "$key"' EXIT
-    read -rsp "Clé git-crypt (base64) : " b64
+    read -rsp "Clé git-crypt (Bitwarden : git-crypt dotfiles chezmoi base64) : " b64
     echo
     base64 -d <<<"$b64" >"$key"
     unset b64
