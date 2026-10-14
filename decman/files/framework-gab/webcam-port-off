@@ -1,0 +1,23 @@
+#!/bin/sh
+# Hook systemd-sleep : la webcam (Framework Webcam Module 2nd Gen, 32ac:001c) se déconnecte puis se
+# reconnecte à l'entrée en s2idle, et ce changement sur le port réveille aussitôt la machine (root
+# hub usb3 de 0000:00:14.0). Couvercle fermé, powerdevil relançait la veille toutes les ~12 s, une
+# nuit entière, sans jamais atteindre l'hibernation (constaté le 12/10/2026, que l'interrupteur de
+# la webcam soit ouvert ou fermé). Couper le port avant la veille, le rallumer au réveil.
+# On ne coupe pas le réveil du root hub : le KVM est branché sur les mêmes ports.
+saved=/run/webcam-port-off
+
+if [ "$1" = pre ]; then
+    for dev in /sys/bus/usb/devices/*; do
+        [ "$(/usr/bin/cat "$dev/idVendor" 2>/dev/null):$(/usr/bin/cat "$dev/idProduct" 2>/dev/null)" = 32ac:001c ] || continue
+        port=$(/usr/bin/readlink -f "$dev/port") || continue
+        echo "$port" > "$saved"
+        echo 1 > "$port/disable"
+    done
+    exit 0
+fi
+
+[ "$1" = post ] || exit 0
+[ -r "$saved" ] || exit 0
+read -r port < "$saved"; /usr/bin/rm -f "$saved"
+echo 0 > "$port/disable"

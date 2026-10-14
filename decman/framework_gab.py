@@ -30,7 +30,7 @@ class FrameworkGab(Module):
             # Reprise sans resume= : l'initramfs systemd lit la variable EFI HibernateLocation.
             # HibernateMode=shutdown : écrire l'image puis s'éteindre, sans entrer en ACPI S4. En S4,
             # le Framework 13 AMD se rallumait tout seul au bout de quelques secondes (constaté sous
-            # NixOS, puis sous Arch le 28/09/2026) ; pas encore essayé sur ce modèle.
+            # NixOS, puis sous Arch le 28/09/2026) ; gardé sur ce modèle, où il marche (vérifié le 14/10/2026).
             "/etc/systemd/sleep.conf.d/hibernate.conf": File(
                 content="[Sleep]\nHibernateDelaySec=60min\nHibernateMode=shutdown\n"
             ),
@@ -38,6 +38,10 @@ class FrameworkGab(Module):
             # le verrouillage de Plasma. Les hooks de veille ne sont lus que dans /usr/lib.
             "/usr/lib/systemd/system-sleep/unlock-after-hibernate": File(
                 source_file=f"{FILES}/unlock-after-hibernate", permissions=0o755
+            ),
+            # La webcam réveille la machine à chaque mise en veille : couper son port pendant la veille.
+            "/usr/lib/systemd/system-sleep/webcam-port-off": File(
+                source_file=f"{FILES}/webcam-port-off", permissions=0o755
             ),
             # Clavier et souris derrière le KVM : réveil par USB (le KVM rattache le hub à chaque
             # bascule, un réglage ponctuel ne survivrait pas).
