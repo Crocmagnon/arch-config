@@ -40,7 +40,10 @@ class Boot(Module):
             # Les HOOKS d'archinstall (custom_commands de user_configuration.json, à garder identiques),
             # plus sd-btrfs-overlayfs : un snapshot est en lecture seule, ce hook monte une couche
             # temporaire en écriture par-dessus pour démarrer. Il vient de l'AUR, d'où son absence là-bas.
+            # thunderbolt ouvre le tunnel DP d'un dock USB4 : sans lui dans l'initramfs, l'écran du
+            # dock reste noir à l'invite LUKS (framework-gab). Sans effet sur une machine sans USB4.
             "/etc/mkinitcpio.conf.d/10-hooks.conf": File(content=(
+                "MODULES=(thunderbolt)\n"
                 "HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block plymouth"
                 " sd-encrypt filesystems sd-btrfs-overlayfs fsck)\n"
             )),
