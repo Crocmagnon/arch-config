@@ -28,6 +28,7 @@ Pour savoir où va une chose : ce qui demande root ou ne concerne qu'Arch va ici
    sudo dd if=archlinux-x86_64.iso of=/dev/sdX bs=4M oflag=direct conv=fsync status=progress
    ```
    Sur un Framework, désactiver Secure Boot dans le BIOS (F2) : l'ISO n'est pas signée. Démarrer sur la clé (F12).
+   Sur framework-gab, activer aussi « Power on AC attach » : posé capot fermé dans son socle, le laptop démarre quand l'alimentation du dock revient. Le BIOS 3.02 n'a pas d'option USB4 avant le boot, donc le menu Limine reste noir derrière le dock ; l'invite LUKS s'affiche.
 2. Sur l'ISO, se connecter au réseau, récupérer ce dépôt, puis générer la configuration pour l'hôte et son disque :
    ```sh
    loadkeys fr
