@@ -25,7 +25,7 @@ Moins chère mais moins sûre sous Linux : Token2 PIN+ Bio3 (37 €).
 
 - **Le PIN FIDO2 est obligatoire pour enrôler les empreintes.** `ykman fido access change-pin`, puis `ykman fido fingerprints add`. Ensuite, `userverification=1 pinverification=0` ne demande que le doigt. La biométrie se bloque après plusieurs échecs d'affilée et exige alors le PIN (nombre exact à vérifier).
 - **Fichiers PAM sur ce système :**
-  - `kde-fingerprint` est fourni par `kscreenlocker` dans `/usr/lib/pam.d/` (`-auth required pam_fprintd.so`). Un fichier du même nom dans `/etc/pam.d/` le remplace : c'est là que decman devra l'écrire, en reprenant tout son contenu. Le commentaire de `decman/framework_gab.py` qui cite `/etc/pam.d/kde-fingerprint` est à corriger.
+  - `kde-fingerprint` est fourni par `kscreenlocker` dans `/usr/lib/pam.d/` (`-auth required pam_fprintd.so`). Un fichier du même nom dans `/etc/pam.d/` le remplace : c'est là que decman devra l'écrire, en reprenant tout son contenu.
   - `/etc/pam.d/sudo` inclut `system-auth`.
 - **Sur le laptop, `pam_u2f` passe avant `pam_fprintd`.** Dans l'ordre inverse, capot fermé, `fprintd` attend jusqu'à son délai d'expiration un doigt sur un capteur inaccessible.
 - **Le mot de passe reste en repli** (`sufficient`), pour ne pas risquer de s'enfermer dehors.
@@ -57,6 +57,9 @@ Pistes, dans l'ordre :
 
 ## Références
 
-- Rapport de recherche initial, non commité : `FINGERPRINT-REPORT.md` (modèles, prix, sources).
+- Achat (prix relevés le 2026-10-16) :
+  - YubiKey Bio FIDO Edition, environ 110 à 118 € : [Yubico FR](https://www.yubico.com/fr/product/yubikey-bio/), [Amazon.fr](https://www.amazon.fr/Yubico-YubiKey-Bio-FIDO-USB/dp/B09KM668XJ) ;
+  - Token2 PIN+ Bio3, 37 € : [Token2](https://www.token2.com/shop/product/token2-pin-bio3-fido2-security-key-with-biometric-authentication).
+- [Liste des périphériques supportés par libfprint](https://fprint.freedesktop.org/supported-devices.html)
 - [Arch Wiki : U2F](https://wiki.archlinux.org/title/U2F)
 - [Yubico pam-u2f](https://developers.yubico.com/pam-u2f/)

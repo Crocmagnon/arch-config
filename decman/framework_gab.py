@@ -12,7 +12,7 @@ class FrameworkGab(Module):
     @pacman.packages
     def pacman_packages(self) -> set[str]:
         return {
-            "fprintd",  # le verrouillage Plasma l'utilise via /etc/pam.d/kde-fingerprint ; pas le login
+            "fprintd",  # le verrouillage Plasma l'utilise via kde-fingerprint (fourni par kscreenlocker) ; pas le login
             "power-profiles-daemon", "iio-sensor-proxy",  # profils d'énergie, luminosité auto
             "framework-system",  # framework_tool
             "powertop", "acpi",  # mesure de la batterie
