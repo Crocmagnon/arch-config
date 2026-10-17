@@ -97,7 +97,7 @@ Ses `custom_commands` font deux choses :
 - `base.py` :
   - les paquets posés par archinstall, qu'il faut déclarer pour que decman ne les supprime pas ;
   - le socle : fish, fisher, gnupg, git-crypt, chezmoi, mise, le client openssh, vim, ripgrep, man (avec `man-db.timer`) ;
-  - sudo sans mot de passe, les locales, `paccache.timer`, et `kernel-modules-hook`, qui garde les modules du noyau en cours jusqu'au redémarrage qui suit sa mise à jour.
+  - sudo sans mot de passe, les locales, `paccache.timer`, `pacman-download.timer` (télécharge chaque jour les mises à jour dans le cache, sans les installer), et `kernel-modules-hook`, qui garde les modules du noyau en cours jusqu'au redémarrage qui suit sa mise à jour.
 - `boot.py` : Limine avec `limine-mkinitcpio-hook`, la ligne de commande du noyau (`/etc/kernel/cmdline`), snapper, snap-pac et `limine-snapper-sync`, et la police de console (Terminus 22 px).
   - Chaque transaction pacman crée un snapshot avant et un après, et chacun devient démarrable depuis le menu Limine avec son propre noyau.
   - Au premier run, le module migre l'installation Limine d'archinstall vers celle de l'outil.
@@ -106,7 +106,7 @@ Ses `custom_commands` font deux choses :
   - Plasma et ses applications, plasma-login-manager en autologin.
   - Le wallet KDE ouvert à l'autologin avec la passphrase LUKS : `pam_systemd_loadkey` dans une copie de `plasmalogin-autologin`, et `KeyringMode=inherit` sur `plasmalogin.service`.
   - Audio, Bluetooth, impression, Docker, Tailscale, iPhone, VM (libvirt et virt-manager).
-  - ufw (entrée refusée, sauf KDE Connect et le réseau NAT de libvirt ; ports Docker publiés sur localhost seulement, `-p 0.0.0.0:…` pour les ouvrir au LAN ; `rp_filter` lâche pour l'exit node Tailscale), Flatpak (PrusaSlicer).
+  - ufw (entrée refusée, sauf KDE Connect et le réseau NAT de libvirt ; ports Docker publiés sur localhost seulement, `-p 0.0.0.0:…` pour les ouvrir au LAN ; `rp_filter` lâche pour l'exit node Tailscale), Flatpak (PrusaSlicer, mis à jour chaque jour par `flatpak-update.timer`), `fwupd-refresh.timer` (métadonnées des firmwares seulement).
 - `apps.py` : les applications (Firefox, Chromium, Signal, Thunderbird, FreeCAD, LibreOffice, calibre, Steam, openscad-git, suite Nordic nRF…) et les outils en ligne de commande qui ne viennent pas de mise.
 - `amd.py` (desktop) et `intel.py` (laptop) : le microcode et les pilotes Vulkan, plus le décodage vidéo VA-API côté Intel.
 - Les paquets AUR se compilent sous l'utilisateur système `builduser`. Les clés PGP des sources signées lui sont fournies par `source.py`.
@@ -125,6 +125,7 @@ Dans le menu Limine, ouvrir **Snapshots**, puis un snapshot, puis son entrée `l
 
 ## Entretien
 
+- Mettre à jour : `sudo decman`, à la main, après un coup d'œil aux news Arch. Les paquets sont déjà en cache. Les mises à jour automatiques sont écartées : interventions manuelles annoncées par les news, `.pacnew`, questions de pacman, transaction coupée par une veille.
 - `openscad-git` n'est recompilé qu'avec `sudo decman --params aur-upgrade-devel`.
 - Après une mise à jour de ufw, fusionner le `.pacnew` de `/etc/ufw/sysctl.conf` (decman le gère avec `rp_filter=2`).
 - Après une mise à jour de nix, fusionner le `.pacnew` de `/etc/nix/nix.conf` (decman le gère pour activer les flakes).

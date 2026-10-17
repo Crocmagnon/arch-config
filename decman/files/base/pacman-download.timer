@@ -1,0 +1,10 @@
+[Unit]
+Description=Download pending pacman updates daily
+
+[Timer]
+OnCalendar=daily
+RandomizedDelaySec=1h
+Persistent=true
+
+[Install]
+WantedBy=timers.target

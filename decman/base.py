@@ -24,7 +24,7 @@ class Base(Module):
             "fish", "fisher", "gnupg", "git-crypt", "chezmoi", "mise",
             # Outils de base, aussi pour root.
             "vim", "ripgrep",
-            "pacman-contrib",  # paccache.timer, l'équivalent de nix gc
+            "pacman-contrib",  # paccache.timer, l'équivalent de nix gc ; checkupdates
             "man-db", "man-pages",
             # Garde les modules du noyau en cours après sa mise à jour (bridge pour docker…),
             # linux-modules-cleanup.service les supprime au démarrage suivant.
@@ -38,7 +38,7 @@ class Base(Module):
     @systemd.units
     def units(self) -> set[str]:
         return {"NetworkManager.service", "paccache.timer", "man-db.timer",
-                "linux-modules-cleanup.service"}
+                "linux-modules-cleanup.service", "pacman-download.timer"}
 
     def files(self) -> dict[str, File]:
         return {
@@ -48,6 +48,13 @@ class Base(Module):
             ),
             "/etc/locale.gen": File(source_file="./files/base/locale.gen"),
             "/etc/locale.conf": File(source_file="./files/base/locale.conf"),
+            # Télécharge seulement : la mise à jour reste un sudo decman à la main (news, .pacnew).
+            "/etc/systemd/system/pacman-download.service": File(
+                source_file="./files/base/pacman-download.service"
+            ),
+            "/etc/systemd/system/pacman-download.timer": File(
+                source_file="./files/base/pacman-download.timer"
+            ),
             # makepkg compile sur un seul cœur par défaut (MAKEFLAGS commenté). makechrootpkg, qui
             # sert aux builds AUR de decman, reprend ce MAKEFLAGS dans son chroot.
             "/etc/makepkg.conf.d/parallel.conf": File(content='MAKEFLAGS="-j$(nproc)"\n'),

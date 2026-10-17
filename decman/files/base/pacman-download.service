@@ -1,0 +1,11 @@
+[Unit]
+Description=Download pending pacman updates to the cache
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+# Base séparée (checkupdates) : la base de pacman n'est pas synchronisée, pas de mise à jour partielle.
+ExecStart=/usr/bin/checkupdates -d
+# 2 : aucune mise à jour.
+SuccessExitStatus=2

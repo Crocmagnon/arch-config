@@ -47,6 +47,8 @@ class Desktop(Module):
         return {
             "plasmalogin.service", "bluetooth.service", "cups.socket",
             "docker.socket", "tailscaled.service", "ufw.service", "libvirtd.socket",
+            # Métadonnées seulement : les firmwares s'installent à la main (fwupdmgr update).
+            "fwupd-refresh.timer", "flatpak-update.timer",
         }
 
     def files(self) -> dict[str, File]:
@@ -68,6 +70,12 @@ class Desktop(Module):
             # Docker accepte un port publié avant les chaînes ufw : un -p 8080:80 serait ouvert au
             # LAN. Les ports publiés n'écoutent que sur localhost, sauf -p 0.0.0.0:8080:80 explicite.
             "/etc/docker/daemon.json": File(content='{"ip": "127.0.0.1"}\n'),
+            "/etc/systemd/system/flatpak-update.service": File(
+                source_file="./files/desktop/flatpak-update.service"
+            ),
+            "/etc/systemd/system/flatpak-update.timer": File(
+                source_file="./files/desktop/flatpak-update.timer"
+            ),
         }
 
     # Aussi appelé au premier run.
