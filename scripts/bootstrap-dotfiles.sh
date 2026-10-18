@@ -7,7 +7,7 @@
 #   scripts/bootstrap-dotfiles.sh
 set -euo pipefail
 
-repo=https://codeberg.org/Crocmagnon/dotfiles.git  # HTTPS : la machine n'a pas encore de clé SSH
+repo=https://github.com/Crocmagnon/dotfiles.git  # HTTPS : la machine n'a pas encore de clé SSH
 src=$HOME/.local/share/chezmoi
 
 [ "$(id -u)" -ne 0 ] || { echo "à lancer en gaugendre, pas en root" >&2; exit 1; }

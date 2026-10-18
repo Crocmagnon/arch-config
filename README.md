@@ -4,7 +4,7 @@ Configuration déclarative d'Arch Linux pour mes machines de bureau :
 - **framework-gab** : Framework 13 Pro Intel ;
 - **desktop-gab** : desktop AMD, carte mère Gigabyte B650.
 
-Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config, Plasma, thèmes) vit dans le dépôt [dotfiles](https://codeberg.org/Crocmagnon/dotfiles) et s'applique avec chezmoi.
+Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config, Plasma, thèmes) vit dans le dépôt [dotfiles](https://github.com/Crocmagnon/dotfiles) et s'applique avec chezmoi.
 
 | Couche | Outil | Dans ce dépôt |
 |---|---|---|
@@ -33,7 +33,7 @@ Pour savoir où va une chose : ce qui demande root ou ne concerne qu'Arch va ici
    ```sh
    loadkeys fr
    iwctl station wlan0 connect <SSID>
-   pacman -Sy git && git clone https://codeberg.org/Crocmagnon/arch-config && cd arch-config
+   pacman -Sy git && git clone https://github.com/Crocmagnon/arch-config && cd arch-config
    archinstall/render.sh framework-gab /dev/nvme0n1 > config.json
    ```
 3. Écrire `archinstall/creds.json`, ignoré par git : `archinstall/creds.sh` demande un mot de passe et le met pour LUKS, `gaugendre` et root. Le même pour LUKS et `gaugendre`, c'est ce qui permet au wallet KDE de s'ouvrir à l'autologin.
@@ -70,7 +70,7 @@ Dans un terminal Plasma (pinentry-qt et le wallet ne sont là qu'en session grap
    ssh-add ~/.ssh/id_ed25519
    gpg --quick-generate-key "Gabriel Augendre <gabriel@augendre.info>" default default 2y
    ```
-   Sauvegarder la clé GPG secrète (`gpg --armor --export-secret-keys`) et son certificat de révocation (`~/.gnupg/openpgp-revocs.d/`) dans Bitwarden. Publier les deux clés publiques sur Codeberg et GitHub, la clé SSH dans `modules/nixos/common/users.nix` (nixos-config, déployé sur srv-1) et sur `hass`. Passer ensuite les remotes de dotfiles et arch-config en SSH.
+   Sauvegarder la clé GPG secrète (`gpg --armor --export-secret-keys`) et son certificat de révocation (`~/.gnupg/openpgp-revocs.d/`) dans Bitwarden. Publier les deux clés publiques sur GitHub, la clé SSH dans `modules/nixos/common/users.nix` (nixos-config, déployé sur srv-1) et sur `hass`. Passer ensuite les remotes de dotfiles et arch-config en SSH.
 2. Comptes et services :
    - `sudo tailscale up --operator=$USER --ssh --accept-routes --accept-dns` si ce n'est pas fait à l'étape 6, appairage KDE Connect ;
    - connexions : Signal, pCloud, Steam, `claude` ; restauration du profil Thunderbird ;

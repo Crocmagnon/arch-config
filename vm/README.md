@@ -68,7 +68,7 @@ Sur l'hôte : l'ISO génère de nouvelles clés d'hôte à chaque démarrage et 
 set ip (virsh -c qemu:///system domifaddr arch-test | string match -rg 'ipv4\s+([\d.]+)')
 set o -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
 ssh-copy-id $o root@$ip
-scp $o -r ~/Projects/codeberg.org/Crocmagnon/arch-config root@$ip:
+scp $o -r ~/Projects/github.com/Crocmagnon/arch-config root@$ip:
 ssh $o root@$ip
 ```
 
@@ -76,7 +76,7 @@ Sans console, on peut aussi taper `passwd` dans le live avec `virsh send-key`, d
 
 `virt-install --cloud-init root-ssh-key=…` a été essayé : l'ISO signale cloud-init `done`, mais la clé n'est pas installée. On reste donc sur `passwd` + `ssh-copy-id`.
 
-Les fichiers passent par `scp` plutôt que par `--config-url` : pas de serveur HTTP sur l'hôte, et rien à ouvrir dans le pare-feu NixOS. `--config-url` (depuis codeberg) ne sert qu'aux vraies installations.
+Les fichiers passent par `scp` plutôt que par `--config-url` : pas de serveur HTTP sur l'hôte, et rien à ouvrir dans le pare-feu NixOS. `--config-url` (depuis GitHub) ne sert qu'aux vraies installations.
 
 ## 4. États sauvegardés
 
