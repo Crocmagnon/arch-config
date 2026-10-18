@@ -13,7 +13,7 @@ class Apps(Module):
         return {
             "firefox", "chromium", "signal-desktop", "telegram-desktop", "thunderbird",
             "freecad", "graphviz",  # graphviz : graphe des dépendances dans FreeCAD
-            "libreoffice-still", "calibre", "tldr", "filelight", "forgejo-cli",
+            "libreoffice-still", "calibre", "tldr", "filelight",
             "steam",  # dépôt multilib, activé par archinstall ; pilote Vulkan dans le module du GPU
             "fuse2",  # AppImages (Rotatrix, nRF Connect)
             "git-lfs", "unzip", "bind", "jq", "age", "watchexec", "htop", "btop", "clang",
