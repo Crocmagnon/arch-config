@@ -29,6 +29,7 @@ class Desktop(Module):
             "usbmuxd", "libimobiledevice", "ifuse",  # iPhone
             # VM (virt-manager) : dnsmasq pour le réseau NAT « default », swtpm pour un TPM virtuel
             "libvirt", "qemu-desktop", "virt-manager", "virtiofsd", "swtpm", "edk2-ovmf", "dnsmasq",
+            "pam-u2f", "yubikey-manager",  # YubiKey Bio au verrouillage ; ykman pour enrôler les empreintes
         }
 
     @aur.packages
@@ -65,6 +66,10 @@ class Desktop(Module):
             "/etc/pam.d/plasmalogin-autologin": File(
                 source_file="./files/desktop/plasmalogin-autologin"
             ),
+            # Empreinte au verrouillage par la YubiKey Bio, derrière le KVM. Le mapping (pamu2fcfg,
+            # origine commune pam://gab) ne contient qu'un handle et une clé publique.
+            "/etc/u2f_mappings": File(source_file="./files/desktop/u2f_mappings"),
+            "/etc/pam.d/kde-fingerprint": File(source_file="./files/desktop/kde-fingerprint"),
             # rp_filter lâche pour l'exit node Tailscale : voir le fichier.
             "/etc/ufw/sysctl.conf": File(source_file="./files/desktop/ufw-sysctl.conf"),
             # Docker accepte un port publié avant les chaînes ufw : un -p 8080:80 serait ouvert au

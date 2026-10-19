@@ -1,0 +1,17 @@
+#%PAM-1.0
+# Copie de /usr/lib/pam.d/kde-fingerprint (kscreenlocker), avec la YubiKey Bio (pam_u2f) avant fprintd :
+# sur le laptop capot fermé, fprintd attendrait un doigt sur un capteur inaccessible.
+
+auth       required                    pam_shells.so
+auth       requisite                   pam_nologin.so
+auth       requisite                   pam_faillock.so      preauth
+auth       [success=1 default=ignore]  pam_u2f.so           authfile=/etc/u2f_mappings origin=pam://gab appid=pam://gab userverification=1 pinverification=0 cue
+-auth      required                    pam_fprintd.so
+auth       optional                    pam_permit.so
+auth       required                    pam_env.so
+
+account    include                     system-local-login
+
+password   required                    pam_deny.so
+
+session    include                     system-local-login
