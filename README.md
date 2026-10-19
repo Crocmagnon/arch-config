@@ -92,7 +92,7 @@ Dans un terminal Plasma (pinentry-qt et le wallet ne sont là qu'en session grap
 
 Ses `custom_commands` font deux choses :
 - **initramfs systemd.** archinstall pose le hook busybox `encrypt`. Les commandes le remplacent par `sd-encrypt` via `/etc/mkinitcpio.conf.d/10-hooks.conf`, et déclarent la racine dans `/etc/crypttab` avec `x-initrd.attach`. C'est nécessaire à la reprise d'hibernation et au déverrouillage du wallet. Le même fichier met `thunderbolt` dans `MODULES` : sans lui, le tunnel DP du dock USB4 n'existe pas avant le démarrage du vrai système, et l'écran du dock reste noir à l'invite LUKS.
-- **swapfile** de la taille de la RAM dans `@swap`, sur le laptop seulement, pour l'hibernation. La reprise passe par la variable EFI `HibernateLocation`, sans `resume=`.
+- **swapfile** de la taille de la RAM dans `@swap`, sur le laptop seulement, pour l'hibernation. La reprise passe par la variable EFI `HibernateLocation`, sans `resume=`. `resumeflags=x-systemd.device-timeout=infinity` la fait attendre la passphrase LUKS sans limite : par défaut, au bout de 2 min, systemd démarre à froid et perd l'image. En contrepartie, une variable obsolète (hiberner, puis réinstaller, reformater ou changer de SSD) bloque le démarrage indéfiniment : démarrer une fois avec `noresume` ajouté dans l'éditeur de Limine (`e`), et systemd efface la variable. C'est aussi le seul moyen de renoncer à une reprise depuis l'invite LUKS.
 
 **decman** (`decman/source.py` choisit les modules selon le hostname) :
 - `base.py` :

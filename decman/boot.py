@@ -10,7 +10,10 @@ from decman import File, Module, prg
 from decman.plugins import aur, pacman, systemd
 
 # Sans cryptdevice= : c'est l'initramfs systemd qui ouvre LUKS, via /etc/crypttab (x-initrd.attach).
-CMDLINE = "root=/dev/mapper/root rootflags=subvol=@ rw rootfstype=btrfs zswap.enabled=0 quiet splash"
+# resumeflags : reprise lue dans la variable EFI HibernateLocation, systemd n'attend le volume que
+# 2 min ; passé ce délai sans passphrase, il démarre à froid et l'image d'hibernation est perdue.
+CMDLINE = ("root=/dev/mapper/root rootflags=subvol=@ rw rootfstype=btrfs zswap.enabled=0 quiet splash"
+           " resumeflags=x-systemd.device-timeout=infinity")
 ARCHINSTALL_EFI_LABEL = "Arch Linux Limine Bootloader"
 
 
