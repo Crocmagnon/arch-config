@@ -52,4 +52,4 @@ decman.aur.makepkg_user = BUILD_USER
 # /tmp est un tmpfs (moitié de la RAM) : trop petit pour certains builds AUR.
 decman.aur.build_dir = "/var/tmp/decman/build"
 
-decman.modules += [Base(), Boot(kernel_params), Desktop(), Apps(), *host_modules, Maintenance(), users]
+decman.modules += [Base(), Boot(kernel_params), Desktop(), Apps(), *host_modules, Maintenance(USER), users]

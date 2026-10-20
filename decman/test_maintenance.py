@@ -18,7 +18,7 @@ answers = iter(["n", "y"])
 m.output.input = lambda prompt: (print(prompt), next(answers))[1]
 
 store = {}
-mod = m.Maintenance()
+mod = m.Maintenance("gaugendre")
 try:
     mod.before_update(store); raise AssertionError("aurait dû s'arrêter")
 except SystemExit as e:
@@ -31,4 +31,22 @@ mod.before_update(store)  # tout est lu : rien à afficher
 sys.stdout = real
 assert "News" not in out.getvalue(), out.getvalue()
 mod.after_update(store)
+
+# Rappel : une notification qui cite le noyau et les news non lues.
+import json, os, tempfile
+calls = []
+m.subprocess.run = lambda cmd, **k: calls.append(cmd)
+m.pending_upgrades = lambda: {"linux", "firefox"}
+with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as f:
+    json.dump({}, f)
+m.STORE_FILE = f.name
+m.os.path.exists = lambda p: True
+m.remind("root")
+assert calls and "2 paquet(s) à mettre à jour, dont le noyau ; 1 news Arch non lue(s)" in calls[0][-1], calls
+calls.clear()
+m.pending_upgrades = lambda: set()
+json.dump({"news_seen": now.isoformat()}, open(f.name, "w"))
+m.remind("root")
+assert not calls, calls  # rien à signaler : pas de notification
+os.remove(f.name)
 print("OK")

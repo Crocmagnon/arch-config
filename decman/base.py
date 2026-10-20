@@ -25,6 +25,7 @@ class Base(Module):
             # Outils de base, aussi pour root.
             "vim", "ripgrep",
             "pacman-contrib",  # paccache.timer, l'équivalent de nix gc ; checkupdates
+            "reflector",  # miroirs (reflector.conf ci-dessous)
             "man-db", "man-pages",
             # Garde les modules du noyau en cours après sa mise à jour (bridge pour docker…),
             # linux-modules-cleanup.service les supprime au démarrage suivant.
@@ -38,10 +39,24 @@ class Base(Module):
     @systemd.units
     def units(self) -> set[str]:
         return {"NetworkManager.service", "paccache.timer", "man-db.timer",
-                "linux-modules-cleanup.service", "pacman-download.timer"}
+                "linux-modules-cleanup.service", "pacman-download.timer", "reflector.timer"}
 
     def files(self) -> dict[str, File]:
         return {
+            # Miroirs à jour (synchronisés il y a moins d'une heure) et rapides, chaque semaine
+            # (reflector.timer). Parmi les 25 synchronisés le plus récemment près d'ici, les 10 au
+            # meilleur débit mesuré. Le mirrorlist.pacnew de pacman-mirrorlist est supprimé
+            # (maintenance.py).
+            "/etc/xdg/reflector/reflector.conf": File(content=(
+                "--save /etc/pacman.d/mirrorlist\n"
+                "--protocol https\n"
+                "--country France,Germany,Netherlands,Belgium,Switzerland\n"
+                "--delay 1\n"
+                "--latest 25\n"
+                "--sort rate\n"
+                "--number 10\n"
+                "--download-timeout 5\n"
+            )),
             # Même chemin que celui d'archinstall, pour le remplacer plutôt que l'empiler.
             f"/etc/sudoers.d/00_{USER}": File(
                 content=f"{USER} ALL=(ALL) NOPASSWD: SETENV: ALL\n", permissions=0o440
@@ -63,6 +78,9 @@ class Base(Module):
     # Aussi appelé au premier run, avec on_enable.
     def on_change(self, store) -> None:
         prg(["locale-gen"])
+        # decman active les unités sans les démarrer : sans ça, timer et premier tri attendraient
+        # le prochain démarrage.
+        prg(["systemctl", "start", "reflector.timer", "reflector.service"])
 
     # usermod plutôt qu'un User() de UserManager : celui-ci alignerait aussi les groupes sur sa
     # liste, et retirerait gaugendre de wheel et des groupes ajoutés dans source.py.
