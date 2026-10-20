@@ -111,6 +111,7 @@ Ses `custom_commands` font deux choses :
   - Audio, Bluetooth, impression, Docker, Tailscale, iPhone, VM (libvirt et virt-manager).
   - ufw (entrée refusée, sauf KDE Connect et le réseau NAT de libvirt ; ports Docker publiés sur localhost seulement, `-p 0.0.0.0:…` pour les ouvrir au LAN ; `rp_filter` lâche pour l'exit node Tailscale), Flatpak (PrusaSlicer, mis à jour chaque jour par `flatpak-update.timer`), `fwupd-refresh.timer` (métadonnées des firmwares seulement).
 - `apps.py` : les applications (Firefox, Chromium, Signal, Thunderbird, FreeCAD, LibreOffice, calibre, Steam, openscad-git…), les outils en ligne de commande qui ne viennent pas de mise, et les règles udev des cartes Nordic pour nRF Connect (AppImage installée par les dotfiles). L'AUR reste minimal : Claude Code, fresh et nRF Connect viennent des dotfiles, RustDesk de Flatpak.
+- `maintenance.py` : à chaque `sudo decman`, les news Arch non lues (avec les paquets installés qu'elles citent) et une confirmation avant la mise à jour ; après, les `.pacnew` avec leur diff, le rappel de redémarrage après un nouveau noyau et les firmwares en attente.
 - `amd.py` (desktop) et `intel.py` (laptop) : le microcode et les pilotes Vulkan, plus le décodage vidéo VA-API côté Intel.
 - Les paquets AUR se compilent sous l'utilisateur système `builduser`. Les clés PGP des sources signées lui sont fournies par `source.py`.
 - `/etc/makepkg.conf.d/parallel.conf` fait compiler sur tous les cœurs (makepkg n'en utilise qu'un par défaut).

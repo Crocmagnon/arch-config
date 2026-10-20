@@ -13,6 +13,7 @@ from boot import Boot
 from desktop import Desktop
 from framework_gab import FrameworkGab
 from intel import Intel
+from maintenance import Maintenance
 
 # Un fichier /etc appartenant à un paquet pas encore installé ferait échouer pacman
 # (« existe déjà dans le système de fichiers ») : on installe d'abord, on écrit ensuite.
@@ -51,4 +52,4 @@ decman.aur.makepkg_user = BUILD_USER
 # /tmp est un tmpfs (moitié de la RAM) : trop petit pour certains builds AUR.
 decman.aur.build_dir = "/var/tmp/decman/build"
 
-decman.modules += [Base(), Boot(kernel_params), Desktop(), Apps(), *host_modules, users]
+decman.modules += [Base(), Boot(kernel_params), Desktop(), Apps(), *host_modules, Maintenance(), users]
