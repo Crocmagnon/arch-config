@@ -28,10 +28,9 @@ class Apps(Module):
     @aur.packages
     def aur_packages(self) -> set[str]:
         return {
-            "rustdesk-bin", "pcloud-drive", "claude-code",
+            "pcloud-drive", "git-toolbelt",
             "openscad-git",  # version de développement (manifold) ; recompilée seulement avec
                              # sudo decman --params aur-upgrade-devel
-            "nrfconnect-appimage", "git-toolbelt", "fresh-editor-bin",
         }
 
     @systemd.units
@@ -40,6 +39,9 @@ class Apps(Module):
 
     def files(self) -> dict[str, File]:
         return {
+            # nRF Connect (AppImage des dotfiles) : accès aux cartes Nordic (PPK2) et ModemManager
+            # tenu à l'écart de leurs ports série. Repris de nrf-udev.
+            "/etc/udev/rules.d/71-nrf.rules": File(source_file="./files/apps/71-nrf.rules"),
             # Possédé par le paquet nix : après une mise à jour, fusionner le .pacnew.
             "/etc/nix/nix.conf": File(content=(
                 "build-users-group = nixbld\n"
