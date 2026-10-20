@@ -70,6 +70,9 @@ class Desktop(Module):
             # origine commune pam://gab) ne contient qu'un handle et une clé publique.
             "/etc/u2f_mappings": File(source_file="./files/desktop/u2f_mappings"),
             "/etc/pam.d/kde-fingerprint": File(source_file="./files/desktop/kde-fingerprint"),
+            "/usr/local/bin/u2f-wait-key": File(
+                source_file="./files/desktop/u2f-wait-key", permissions=0o755
+            ),
             # rp_filter lâche pour l'exit node Tailscale : voir le fichier.
             "/etc/ufw/sysctl.conf": File(source_file="./files/desktop/ufw-sysctl.conf"),
             # Docker accepte un port publié avant les chaînes ufw : un -p 8080:80 serait ouvert au

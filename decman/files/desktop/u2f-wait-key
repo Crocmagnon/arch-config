@@ -1,0 +1,13 @@
+#!/bin/bash
+# Lancé par pam_exec avant pam_u2f (kde-fingerprint) : attend que la YubiKey Bio soit branchée. Verrouillé
+# KVM basculé, la clé est absente et pam_u2f échouerait aussitôt, sans que kscreenlocker relance.
+# Capot ouvert, pas d'attente : le capteur du laptop répond.
+grep -qs open /proc/acpi/button/lid/*/state && exit 0
+worker=$PPID
+until grep -qs HID_ID=0003:00001050:00000402 /sys/class/hidraw/*/device/uevent; do
+  # Mot de passe saisi, kscreenlocker tue le worker : ne pas lui survivre.
+  kill -0 "$worker" 2>/dev/null || exit 1
+  sleep 1
+done
+# Laisser logind poser l'ACL uaccess sur le nouveau hidraw.
+sleep 1
