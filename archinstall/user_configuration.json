@@ -70,7 +70,7 @@
     }
   },
   "custom_commands": [
-    "set -e\ndev=$(cryptsetup status root | awk '$1 == \"device:\" {print $2}')\necho \"root UUID=$(blkid -s UUID -o value \"$dev\") none luks,discard,x-initrd.attach\" >> /etc/crypttab\n# HOOKS : comme dans decman/boot.py, sans sd-btrfs-overlayfs (AUR, pas encore installé).\nprintf '%s\\n' 'MODULES=(thunderbolt)' 'HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block plymouth sd-encrypt filesystems fsck)' > /etc/mkinitcpio.conf.d/10-hooks.conf\nmkinitcpio -P",
+    "set -e\ndev=$(cryptsetup status root | awk '$1 == \"device:\" {print $2}')\necho \"root UUID=$(blkid -s UUID -o value \"$dev\") none luks,discard,x-initrd.attach,fido2-device=auto\" >> /etc/crypttab\n# HOOKS : comme dans decman/boot.py, sans sd-btrfs-overlayfs (AUR, pas encore installé).\nprintf '%s\\n' 'MODULES=(thunderbolt)' 'HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block plymouth sd-encrypt filesystems fsck)' > /etc/mkinitcpio.conf.d/10-hooks.conf\nmkinitcpio -P",
     "set -e\ncase \"$(cat /etc/hostname)\" in framework-gab*) ;; *) exit 0 ;; esac\nram=$(awk '/MemTotal/ {print int($2 / 1048576) + 1}' /proc/meminfo)\nbtrfs filesystem mkswapfile --size \"${ram}g\" --uuid clear /swap/swapfile\necho '/swap/swapfile none swap defaults 0 0' >> /etc/fstab"
   ]
 }

@@ -1,8 +1,7 @@
 #!/bin/bash
 # Écrit archinstall/creds.json (ignoré par git) : demande un mot de passe, qui sert à LUKS, à
-# gaugendre et à root. Le même pour LUKS et gaugendre : c'est ce qui ouvre le wallet KDE à
-# l'autologin. Le mot de passe passe par l'environnement, jamais par les arguments (visibles
-# dans ps).
+# gaugendre et à root. Le mot de passe passe par l'environnement, jamais par les arguments
+# (visibles dans ps).
 set -eu
 read -rsp "Mot de passe : " pw; echo
 read -rsp "Confirmer : " pw2; echo

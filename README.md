@@ -14,7 +14,7 @@ Ce dépôt couvre la partie système. La partie utilisateur (fichiers de config,
 
 Pour savoir où va une chose : ce qui demande root ou ne concerne qu'Arch va ici (paquets, `/etc`, unités système, udev, groupes), ainsi que les outils nécessaires avant chezmoi et mise. Tout ce qui vit sous `$HOME` va dans dotfiles, y compris les unités utilisateur et les réglages Plasma. dotfiles sert aussi les machines du travail (Ubuntu, Debian). Un outil en ligne de commande utile partout vient donc de mise, dans dotfiles. Un outil propre à Arch, ou que mise ne sait pas installer, vient de pacman, ici.
 
-> **État (28/09/2026).** Migration depuis NixOS terminée : le laptop `framework-gab-amd` et le desktop `desktop-gab` tournent sous Arch avec cette config. Vérifié sur le matériel : sur le laptop, l'hibernation, l'empreinte et le réveil par le KVM ; sur le desktop, l'écran DisplayPort à l'invite LUKS (y compris allumé après coup) et la veille ; sur les deux, l'exit node Tailscale. Chaque machine perso a ses propres clés SSH et GPG. srv-1 reste sous NixOS et se déploie depuis lui-même (`mise run srv-1` dans nixos-config). Le Framework 13 AMD a laissé place au Framework 13 Pro Intel (`framework-gab`, 12/10/2026). Son module reprend l'hibernation, le KVM et l'empreinte de l'ancien laptop. Y sont vérifiés (14/10/2026) : l'hibernation (une fois coupé le port de la webcam qui réveillait la machine), l'empreinte et les pilotes Intel (Vulkan, VA-API) ; puis (16/10/2026) l'écran du dock USB4 à l'invite LUKS, capot fermé, grâce à `thunderbolt` dans l'initramfs (le menu Limine reste noir derrière le dock) ; le réveil par le KVM reste à vérifier. Une YubiKey Bio derrière le KVM donne l'empreinte au verrouillage au bureau, où le laptop sert capot fermé : vérifié sur les deux machines (19/10/2026), y compris verrouillé pendant que le KVM était sur l'autre. L'inventaire et les décisions de la migration sont dans l'historique git (`git log -- MIGRATION.md`).
+> **État (28/09/2026).** Migration depuis NixOS terminée : le laptop `framework-gab-amd` et le desktop `desktop-gab` tournent sous Arch avec cette config. Vérifié sur le matériel : sur le laptop, l'hibernation, l'empreinte et le réveil par le KVM ; sur le desktop, l'écran DisplayPort à l'invite LUKS (y compris allumé après coup) et la veille ; sur les deux, l'exit node Tailscale. Chaque machine perso a ses propres clés SSH et GPG. srv-1 reste sous NixOS et se déploie depuis lui-même (`mise run srv-1` dans nixos-config). Le Framework 13 AMD a laissé place au Framework 13 Pro Intel (`framework-gab`, 12/10/2026). Son module reprend l'hibernation, le KVM et l'empreinte de l'ancien laptop. Y sont vérifiés (14/10/2026) : l'hibernation (une fois coupé le port de la webcam qui réveillait la machine), l'empreinte et les pilotes Intel (Vulkan, VA-API) ; puis (16/10/2026) l'écran du dock USB4 à l'invite LUKS, capot fermé, grâce à `thunderbolt` dans l'initramfs (le menu Limine reste noir derrière le dock) ; le réveil par le KVM reste à vérifier. Une YubiKey Bio derrière le KVM donne l'empreinte au verrouillage au bureau, où le laptop sert capot fermé : vérifié sur les deux machines (19/10/2026), y compris verrouillé pendant que le KVM était sur l'autre. Elle déverrouille aussi LUKS, avec un wallet sans mot de passe : vérifié sur desktop-gab (20/10/2026), par la clé comme par la passphrase après les 30 s d'attente ; framework-gab reste à enrôler. L'inventaire et les décisions de la migration sont dans l'historique git (`git log -- MIGRATION.md`).
 
 ## Installer une machine
 
@@ -36,7 +36,7 @@ Pour savoir où va une chose : ce qui demande root ou ne concerne qu'Arch va ici
    pacman -Sy git && git clone https://github.com/Crocmagnon/arch-config && cd arch-config
    archinstall/render.sh framework-gab /dev/nvme0n1 > config.json
    ```
-3. Écrire `archinstall/creds.json`, ignoré par git : `archinstall/creds.sh` demande un mot de passe et le met pour LUKS, `gaugendre` et root. Le même pour LUKS et `gaugendre`, c'est ce qui permet au wallet KDE de s'ouvrir à l'autologin.
+3. Écrire `archinstall/creds.json`, ignoré par git : `archinstall/creds.sh` demande un mot de passe et le met pour LUKS, `gaugendre` et root.
 4. Lancer l'installation, puis redémarrer :
    ```sh
    archinstall --config config.json --creds archinstall/creds.json --silent
@@ -76,6 +76,8 @@ Dans un terminal Plasma (pinentry-qt et le wallet ne sont là qu'en session grap
    - connexions : Signal, pCloud, Steam, `claude` ; restauration du profil Thunderbird ;
    - `fprintd-enroll` (laptop) ;
    - YubiKey Bio, seulement pour une nouvelle clé (le mapping est dans le dépôt, commun aux deux machines) : `ykman fido access change-pin`, `ykman fido fingerprints add <nom>`, puis `pamu2fcfg -u gaugendre -o pam://gab -i pam://gab -V > decman/files/desktop/u2f_mappings` (aucun message : toucher la clé quand la commande semble bloquée) et `sudo decman` ;
+   - YubiKey Bio pour LUKS, sur chaque machine : `sudo systemd-cryptenroll /dev/disk/by-uuid/<uuid LUKS> --fido2-device=auto --fido2-with-client-pin=no --fido2-with-user-verification=yes` (`lsblk -o NAME,FSTYPE,UUID` pour l'UUID). La ligne crypttab a déjà `fido2-device=auto` ; sur une installation plus ancienne, l'ajouter puis lancer `sudo limine-mkinitcpio` ;
+   - wallet sans mot de passe : kwalletmanager, « Changer le mot de passe… », champs vides ;
    - `fwupdmgr refresh && fwupdmgr update` ;
    - `flatpak remote-add flathub-beta …`, installer PrusaSlicer `//beta`, puis l'ajouter à `ignored_packages` (decman ne gère ni remotes ni branches).
 3. Contrôles :
@@ -91,7 +93,7 @@ Dans un terminal Plasma (pinentry-qt et le wallet ne sont là qu'en session grap
 - Limine, plymouth, zram, NetworkManager, le dépôt `multilib` (pour Steam), clavier `fr`, fuseau Europe/Paris.
 
 Ses `custom_commands` font deux choses :
-- **initramfs systemd.** archinstall pose le hook busybox `encrypt`. Les commandes le remplacent par `sd-encrypt` via `/etc/mkinitcpio.conf.d/10-hooks.conf`, et déclarent la racine dans `/etc/crypttab` avec `x-initrd.attach`. C'est nécessaire à la reprise d'hibernation et au déverrouillage du wallet. Le même fichier met `thunderbolt` dans `MODULES` : sans lui, le tunnel DP du dock USB4 n'existe pas avant le démarrage du vrai système, et l'écran du dock reste noir à l'invite LUKS.
+- **initramfs systemd.** archinstall pose le hook busybox `encrypt`. Les commandes le remplacent par `sd-encrypt` via `/etc/mkinitcpio.conf.d/10-hooks.conf`, et déclarent la racine dans `/etc/crypttab` avec `x-initrd.attach`. C'est nécessaire à la reprise d'hibernation et au déverrouillage par la YubiKey Bio (`fido2-device=auto`). Le même fichier met `thunderbolt` dans `MODULES` : sans lui, le tunnel DP du dock USB4 n'existe pas avant le démarrage du vrai système, et l'écran du dock reste noir à l'invite LUKS.
 - **swapfile** de la taille de la RAM dans `@swap`, sur le laptop seulement, pour l'hibernation. La reprise passe par la variable EFI `HibernateLocation`, sans `resume=`. `resumeflags=x-systemd.device-timeout=infinity` la fait attendre la passphrase LUKS sans limite : par défaut, au bout de 2 min, systemd démarre à froid et perd l'image. En contrepartie, une variable obsolète (hiberner, puis réinstaller, reformater ou changer de SSD) bloque le démarrage indéfiniment : démarrer une fois avec `noresume` ajouté dans l'éditeur de Limine (`e`), et systemd efface la variable. C'est aussi le seul moyen de renoncer à une reprise depuis l'invite LUKS.
 
 **decman** (`decman/source.py` choisit les modules selon le hostname) :
@@ -105,7 +107,6 @@ Ses `custom_commands` font deux choses :
 
 - `desktop.py` : la session Plasma et les services du bureau.
   - Plasma et ses applications, plasma-login-manager en autologin.
-  - Le wallet KDE ouvert à l'autologin avec la passphrase LUKS : `pam_systemd_loadkey` dans une copie de `plasmalogin-autologin`, et `KeyringMode=inherit` sur `plasmalogin.service`.
   - L'empreinte au verrouillage par la YubiKey Bio : `pam_u2f` dans une copie de `kde-fingerprint`, avant `pam_fprintd`. sudo est sans mot de passe, donc pas concerné.
   - Audio, Bluetooth, impression, Docker, Tailscale, iPhone, VM (libvirt et virt-manager).
   - ufw (entrée refusée, sauf KDE Connect et le réseau NAT de libvirt ; ports Docker publiés sur localhost seulement, `-p 0.0.0.0:…` pour les ouvrir au LAN ; `rp_filter` lâche pour l'exit node Tailscale), Flatpak (PrusaSlicer, mis à jour chaque jour par `flatpak-update.timer`), `fwupd-refresh.timer` (métadonnées des firmwares seulement).

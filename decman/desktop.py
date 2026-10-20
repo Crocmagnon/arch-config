@@ -57,15 +57,6 @@ class Desktop(Module):
             "/etc/plasmalogin.conf.d/autologin.conf": File(
                 content=f"[Autologin]\nUser={USER}\nSession=plasma\n"
             ),
-            # Wallet ouvert à l'autologin avec la passphrase LUKS (Arch Wiki, KDE Wallet) :
-            # systemd-cryptsetup la laisse dans le trousseau du noyau, le service de connexion en
-            # hérite, pam_systemd_loadkey la passe à pam_kwallet5.
-            "/etc/systemd/system/plasmalogin.service.d/keyring.conf": File(
-                content="[Service]\nKeyringMode=inherit\n"
-            ),
-            "/etc/pam.d/plasmalogin-autologin": File(
-                source_file="./files/desktop/plasmalogin-autologin"
-            ),
             # Empreinte au verrouillage par la YubiKey Bio, derrière le KVM. Le mapping (pamu2fcfg,
             # origine commune pam://gab) ne contient qu'un handle et une clé publique.
             "/etc/u2f_mappings": File(source_file="./files/desktop/u2f_mappings"),
