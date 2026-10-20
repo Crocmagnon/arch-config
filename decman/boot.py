@@ -15,6 +15,8 @@ from decman.plugins import aur, pacman, systemd
 CMDLINE = ("root=/dev/mapper/root rootflags=subvol=@ rw rootfstype=btrfs zswap.enabled=0 quiet splash"
            " resumeflags=x-systemd.device-timeout=infinity")
 ARCHINSTALL_EFI_LABEL = "Arch Linux Limine Bootloader"
+LUKS_ATTACH = "/usr/local/bin/luks-attach"
+LUKS_DROPIN = "/etc/systemd/system/systemd-cryptsetup@root.service.d/luks-attach.conf"
 
 
 class Boot(Module):
@@ -45,11 +47,16 @@ class Boot(Module):
             # temporaire en écriture par-dessus pour démarrer. Il vient de l'AUR, d'où son absence là-bas.
             # thunderbolt ouvre le tunnel DP d'un dock USB4 : sans lui dans l'initramfs, l'écran du
             # dock reste noir à l'invite LUKS (framework-gab). Sans effet sur une machine sans USB4.
+            # FILES : luks-attach et sa drop-in, ci-dessous.
             "/etc/mkinitcpio.conf.d/10-hooks.conf": File(content=(
                 "MODULES=(thunderbolt)\n"
                 "HOOKS=(base systemd autodetect microcode modconf kms keyboard sd-vconsole block plymouth"
                 " sd-encrypt filesystems sd-btrfs-overlayfs fsck)\n"
+                f"FILES=({LUKS_ATTACH} {LUKS_DROPIN})\n"
             )),
+            # Un doigt refusé à l'invite LUKS envoyait en emergency mode : voir luks-attach.
+            LUKS_ATTACH: File(source_file="./files/boot/luks-attach", permissions=0o755),
+            LUKS_DROPIN: File(content=f"[Service]\nExecStart=\nExecStart={LUKS_ATTACH}\n"),
             # Police de console de 22 px, lisible sur les écrans du laptop et du desktop, pour les TTY
             # et les logs de démarrage. Le hook sd-vconsole la copie dans l'initramfs, que
             # on_change régénère.

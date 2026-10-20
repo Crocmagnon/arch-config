@@ -1,0 +1,10 @@
+#!/bin/sh
+# ExecStart de systemd-cryptsetup@root dans l'initramfs (boot.py). Un doigt refusé par la YubiKey
+# Bio remonte en EIO, et systemd-cryptsetup ne retente que sur une clé absente : l'unité échouait
+# et le démarrage tombait en emergency mode. Trois essais avec la clé, puis la passphrase seule.
+set -- $(awk '$1 == "root"' /etc/crypttab)
+dev=/dev/disk/by-uuid/${2#UUID=}
+for _ in 1 2 3; do
+    /usr/bin/systemd-cryptsetup attach root "$dev" none "$4" && exit 0
+done
+exec /usr/bin/systemd-cryptsetup attach root "$dev" none "$(echo "$4" | sed 's/,fido2-device=auto//')"
