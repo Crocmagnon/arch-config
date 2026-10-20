@@ -3,6 +3,8 @@ from decman import File, Module, prg
 from decman.plugins import aur, pacman, systemd
 
 USER = "gaugendre"
+BUILD_USER = "builduser"  # builds AUR (source.py)
+SRCDEST = "/var/cache/decman/src"
 
 
 class Base(Module):
@@ -73,11 +75,19 @@ class Base(Module):
             # makepkg compile sur un seul cœur par défaut (MAKEFLAGS commenté). makechrootpkg, qui
             # sert aux builds AUR de decman, reprend ce MAKEFLAGS dans son chroot.
             "/etc/makepkg.conf.d/parallel.conf": File(content='MAKEFLAGS="-j$(nproc)"\n'),
+            # Sources des builds AUR gardées d'un build à l'autre (makechrootpkg monte SRCDEST dans
+            # son chroot) : les paquets limine ne retéléchargent plus le JDK GraalVM (300 Mio) tant
+            # que sa version ne change pas. Ce qui n'a pas servi depuis 90 jours est supprimé.
+            "/etc/makepkg.conf.d/srcdest.conf": File(content=f"SRCDEST={SRCDEST}\n"),
+            "/etc/tmpfiles.d/decman-srcdest.conf": File(
+                content=f"d {SRCDEST} 0755 {BUILD_USER} {BUILD_USER} 90d\n"
+            ),
         }
 
     # Aussi appelé au premier run, avec on_enable.
     def on_change(self, store) -> None:
         prg(["locale-gen"])
+        prg(["systemd-tmpfiles", "--create", "/etc/tmpfiles.d/decman-srcdest.conf"])
         # decman active les unités sans les démarrer : sans ça, timer et premier tri attendraient
         # le prochain démarrage.
         prg(["systemctl", "start", "reflector.timer", "reflector.service"])

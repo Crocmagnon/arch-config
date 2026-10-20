@@ -15,7 +15,7 @@ class Apps(Module):
             "freecad", "graphviz",  # graphviz : graphe des dépendances dans FreeCAD
             "libreoffice-still", "calibre", "tldr", "filelight",
             "steam",  # dépôt multilib, activé par archinstall ; pilote Vulkan dans le module du GPU
-            "fuse2",  # AppImages (Rotatrix, nRF Connect)
+            "fuse2",  # AppImages (Rotatrix)
             "git-lfs", "unzip", "bind", "jq", "age", "watchexec", "htop", "btop", "clang",
             "vscode-json-languageserver", "yaml-language-server",
             "luarocks", "luacheck", "busted",  # outils Lua absents de mise (luajit, stylua, lua-language-server y sont)
@@ -29,6 +29,7 @@ class Apps(Module):
     def aur_packages(self) -> set[str]:
         return {
             "pcloud-drive", "git-toolbelt",
+            "nrfconnect-appimage",  # sa dépendance J-Link est figée (source.py)
             "openscad-git",  # version de développement (manifold) ; recompilée seulement avec
                              # sudo decman --params aur-upgrade-devel
         }
@@ -39,9 +40,6 @@ class Apps(Module):
 
     def files(self) -> dict[str, File]:
         return {
-            # nRF Connect (AppImage des dotfiles) : accès aux cartes Nordic (PPK2) et ModemManager
-            # tenu à l'écart de leurs ports série. Repris de nrf-udev.
-            "/etc/udev/rules.d/71-nrf.rules": File(source_file="./files/apps/71-nrf.rules"),
             # Possédé par le paquet nix : après une mise à jour, fusionner le .pacnew.
             "/etc/nix/nix.conf": File(content=(
                 "build-users-group = nixbld\n"
