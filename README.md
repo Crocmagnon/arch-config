@@ -77,7 +77,7 @@ Dans un terminal Plasma (pinentry-qt et le wallet ne sont là qu'en session grap
    - `fprintd-enroll` (laptop) ;
    - YubiKey Bio, seulement pour une nouvelle clé (le mapping est dans le dépôt, commun aux deux machines) : `ykman fido access change-pin`, `ykman fido fingerprints add <nom>`, puis `pamu2fcfg -u gaugendre -o pam://gab -i pam://gab -V > decman/files/desktop/u2f_mappings` (aucun message : toucher la clé quand la commande semble bloquée) et `sudo decman` ;
    - YubiKey Bio pour LUKS, sur chaque machine : `sudo systemd-cryptenroll /dev/disk/by-uuid/<uuid LUKS> --fido2-device=auto --fido2-with-client-pin=no --fido2-with-user-verification=yes` (`lsblk -o NAME,FSTYPE,UUID` pour l'UUID). La ligne crypttab a déjà `fido2-device=auto` ; sur une installation plus ancienne, l'ajouter puis lancer `sudo limine-mkinitcpio` ;
-   - wallet sans mot de passe : kwalletmanager, « Changer le mot de passe… », champs vides ;
+   - wallet sans mot de passe, sur les deux machines (sinon il reste fermé à l'autologin) : kwalletmanager, « Changer le mot de passe… », champs vides ;
    - `fwupdmgr refresh && fwupdmgr update` ;
    - `flatpak remote-add flathub-beta …`, installer PrusaSlicer `//beta`, puis l'ajouter à `ignored_packages` (decman ne gère ni remotes ni branches).
 3. Contrôles :
