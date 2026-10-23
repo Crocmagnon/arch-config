@@ -6,10 +6,13 @@ auth       required                    pam_shells.so
 auth       requisite                   pam_nologin.so
 auth       requisite                   pam_faillock.so      preauth
 # Trois essais : pam_u2f ne lit qu'une empreinte par appel. Chaque ligne réussie saute les suivantes
-# et fprintd. Clé absente, chaque essai échoue aussitôt : u2f-wait-key l'attend d'abord.
+# et fprintd. Clé absente, chaque essai échoue aussitôt : u2f-wait-key l'attend avant chacun, sinon
+# une clé débranchée un instant (KVM, réveil de veille) épuisait les trois essais d'un coup.
+auth       optional                    pam_exec.so          quiet /usr/local/bin/u2f-wait-key
+auth       [success=5 default=ignore]  pam_u2f.so           authfile=/etc/u2f_mappings origin=pam://gab appid=pam://gab userverification=1 pinverification=0 cue
 auth       optional                    pam_exec.so          quiet /usr/local/bin/u2f-wait-key
 auth       [success=3 default=ignore]  pam_u2f.so           authfile=/etc/u2f_mappings origin=pam://gab appid=pam://gab userverification=1 pinverification=0 cue
-auth       [success=2 default=ignore]  pam_u2f.so           authfile=/etc/u2f_mappings origin=pam://gab appid=pam://gab userverification=1 pinverification=0 cue
+auth       optional                    pam_exec.so          quiet /usr/local/bin/u2f-wait-key
 auth       [success=1 default=ignore]  pam_u2f.so           authfile=/etc/u2f_mappings origin=pam://gab appid=pam://gab userverification=1 pinverification=0 cue
 -auth      required                    pam_fprintd.so
 auth       optional                    pam_permit.so
