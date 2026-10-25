@@ -1,0 +1,35 @@
+#!/bin/sh
+# Hook systemd-sleep : derrière le KVM, le hub échoue parfois à se réinitialiser au réveil (err -71)
+# et la YubiKey Bio revient bloquée : présente, mais toute écriture HID expire (fido_hid_write:
+# Connection timed out), et chaque essai de pam_u2f au verrouillage échoue jusqu'à ce qu'on la
+# débranche (constaté le 25/10/2026). La sonder après le réveil, et si elle ne répond pas, couper
+# puis rallumer son port : un débranchement logiciel.
+# Un essai pam_u2f en cours occupe la clé : elle devrait alors répondre aussitôt par une erreur (pas
+# vérifié), pas par une expiration, d'où le test sur « timed out » plutôt que sur le code de sortie.
+case "$1" in
+    # Hors de systemd-suspend.service, dont le cgroup est tué à la fin des hooks, et sans retarder le réveil.
+    post) exec /usr/bin/systemd-run --no-block --collect --quiet "$0" revive ;;
+    revive) ;;
+    *) exit 0 ;;
+esac
+
+# Le hub du KVM peut mettre plusieurs secondes à revenir.
+for _ in $(/usr/bin/seq 30); do
+    for h in /sys/class/hidraw/*; do
+        /usr/bin/grep -qs HID_ID=0003:00001050:00000402 "$h/device/uevent" || continue
+        node=/dev/${h##*/}
+        usbdev=$(/usr/bin/dirname "$(/usr/bin/dirname "$(/usr/bin/readlink -f "$h/device")")")
+    done
+    [ -n "$node" ] && break
+    /usr/bin/sleep 1
+done
+[ -n "$node" ] || exit 0
+
+FIDO_DEBUG=1 /usr/bin/timeout 20 /usr/bin/fido2-token -I "$node" 2>&1 >/dev/null \
+    | /usr/bin/grep -q 'timed out' || exit 0
+
+port=$(/usr/bin/readlink -f "$usbdev/port") || exit 0
+/usr/bin/logger -t yubikey-revive "YubiKey bloquée ($node), redémarrage de $port"
+echo 1 > "$port/disable"
+/usr/bin/sleep 1
+echo 0 > "$port/disable"

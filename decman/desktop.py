@@ -64,6 +64,10 @@ class Desktop(Module):
             "/usr/local/bin/u2f-wait-key": File(
                 source_file="./files/desktop/u2f-wait-key", permissions=0o755
             ),
+            # Au réveil, la clé peut revenir bloquée derrière le KVM : la débrancher par logiciel.
+            "/usr/lib/systemd/system-sleep/yubikey-revive": File(
+                source_file="./files/desktop/yubikey-revive", permissions=0o755
+            ),
             # rp_filter lâche pour l'exit node Tailscale : voir le fichier.
             "/etc/ufw/sysctl.conf": File(source_file="./files/desktop/ufw-sysctl.conf"),
             # Docker accepte un port publié avant les chaînes ufw : un -p 8080:80 serait ouvert au
