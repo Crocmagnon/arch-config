@@ -69,4 +69,4 @@ JLINK = "jlink-software-and-documentation"
 if subprocess.run(["pacman", "-Q", JLINK], capture_output=True).returncode == 0:
     decman.aur.ignored_packages.add(JLINK)
 
-decman.modules += [Base(), Boot(kernel_params), Desktop(), Niri(autologin=host == "desktop-gab"), Apps(), *host_modules, Maintenance(USER), users, keys]
+decman.modules += [Base(), Boot(kernel_params), Desktop(), Niri(autologin=True), Apps(), *host_modules, Maintenance(USER), users, keys]
