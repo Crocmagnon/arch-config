@@ -95,5 +95,5 @@ On the work machines the same tools come from apt (laptop) or a local mise confi
 
 - Never decrypt, print or modify secrets: git-crypt files in dotfiles, agenix files in nixos-config. The user runs re-encryption scripts themselves.
 - No commit or push without the user's go. The user reviews at the end of each phase.
-- Never touch `srv-1` in nixos-config.
+- Never touch `srv-1` in nixos-config without explicit user permission.
 - In the VM, drive interactive decman runs with `vm/answer.py`, type the LUKS passphrase with `virsh send-key`, and never pass `pkill -f` a pattern that matches your own ssh command line.
