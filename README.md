@@ -117,7 +117,7 @@ Ses `custom_commands` font deux choses :
 - Les paquets AUR se compilent sous l'utilisateur système `builduser`. Les clés PGP des sources signées lui sont fournies par `source.py`.
 - `/etc/makepkg.conf.d/parallel.conf` fait compiler sur tous les cœurs (makepkg n'en utilise qu'un par défaut).
 - `framework_gab.py` (laptop) :
-  - l'hibernation (veille, puis hibernation au bout d'une heure) et la levée du verrouillage de Plasma après une hibernation de plus de 5 min ; le port de la webcam coupé pendant la veille, car elle réveillait la machine aussitôt ;
+  - l'hibernation (veille, puis hibernation au bout d'une heure ; sous niri, le capot passe par logind) et la levée du verrouillage de Plasma après une hibernation de plus de 5 min ; le port de la webcam coupé pendant la veille, car elle réveillait la machine aussitôt ;
   - l'empreinte digitale au verrouillage de l'écran, les profils d'énergie ;
   - le réveil par le clavier derrière le KVM ;
   - les outils de mesure de la batterie ;
