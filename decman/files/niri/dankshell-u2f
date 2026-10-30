@@ -1,0 +1,21 @@
+#%PAM-1.0
+# Verrou de Dux Shell (niri, essai) : la YubiKey Bio seule, en u2fMode « ou ». Dux Shell ne lance
+# cette pile qu'à la demande (Ctrl+Q, ou le bouton clé de sécurité), et l'annule au bout de 30 s :
+# un seul essai suffit, la Bio attendant 29 s un doigt. u2f-wait-key attend d'abord la clé, absente
+# quand le KVM était basculé. Options pam_u2f : celles de files/desktop/kde-fingerprint ; pas de
+# fprintd (desktop-gab n'a pas de capteur). Sans bloc DMS, dms auth sync laisse ce fichier intact.
+
+auth       required                    pam_shells.so
+auth       requisite                   pam_nologin.so
+auth       requisite                   pam_faillock.so      preauth
+auth       optional                    pam_exec.so          quiet /usr/local/bin/u2f-wait-key
+auth       [success=1 default=ignore]  pam_u2f.so           authfile=/etc/u2f_mappings origin=pam://gab appid=pam://gab userverification=1 pinverification=0 cue debug debug_file=syslog
+auth       requisite                   pam_deny.so
+auth       optional                    pam_permit.so
+auth       required                    pam_env.so
+
+account    include                     system-local-login
+
+password   required                    pam_deny.so
+
+session    include                     system-local-login
