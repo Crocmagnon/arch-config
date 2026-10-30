@@ -1,8 +1,13 @@
 # Session Plasma et services système du bureau : tout ce qui ne dépend pas de la machine.
+import subprocess
+
 from decman import File, Module, prg
 from decman.plugins import flatpak, pacman, systemd, aur
 
 from base import USER
+
+
+PRINTER = "Brother_MFC-J5740DW"
 
 
 class Desktop(Module):
@@ -99,3 +104,10 @@ class Desktop(Module):
         # vers l'extérieur. Sans ça, ufw les bloque et une VM n'obtient pas d'IP.
         prg(["ufw", "allow", "in", "on", "virbr0", "comment", "libvirt"])
         prg(["ufw", "route", "allow", "in", "on", "virbr0", "comment", "libvirt"])
+        # Imprimante réseau en IPP sans pilote (AirPrint 2.1, IP fixe) : créée si absente, sinon
+        # laissée telle quelle. Injoignable (laptop hors de la maison), l'échec n'arrête pas decman
+        # et le run suivant réessaie.
+        if subprocess.run(["lpstat", "-v", PRINTER], capture_output=True).returncode != 0:
+            prg(["lpadmin", "-p", PRINTER, "-E", "-v", "ipp://192.168.0.16/ipp/print", "-m", "everywhere",
+                 "-D", "Brother MFC-J5740DW", "-L", "Maison"], check=False)
+            prg(["lpadmin", "-d", PRINTER], check=False)
