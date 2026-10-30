@@ -20,6 +20,9 @@ class Apps(Module):
             "vscode-json-languageserver", "yaml-language-server",
             "luarocks", "luacheck", "busted",  # outils Lua absents de mise (luajit, stylua, lua-language-server y sont)
             "nix",  # flakes des repos qui en ont un (downloader-go)
+            "pulseview", "sigrok-cli",  # oscilloscope Rigol DS1102E en USB ; règles udev fournies par libsigrok
+            "sigrok-firmware-fx2lafw",  # analyseur logique 8 voies 24 MHz (clone Saleae, Cypress FX2)
+            "wget",  # requis par setup.sh du Zephyr SDK (west sdk install, builds ZMK)
             # Home Assistant dev tools
             "base-devel", "python", "python-pip", "python-virtualenv",
             "libxml2", "libxslt", "libjpeg-turbo", "libffi", "ffmpeg", "cmake"
