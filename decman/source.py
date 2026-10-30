@@ -25,7 +25,11 @@ decman.execution_order = ["pacman", "aur", "flatpak", "files", "systemd"]
 HOSTS = {
     "framework-gab": ((), [Intel(), FrameworkGab()]),
     "desktop-gab": (
-        ('acpi_osi="!Windows 2015"',),  # veille sur la B650 (nixos-hardware)
+        (
+            'acpi_osi="!Windows 2015"',  # veille sur la B650 (nixos-hardware)
+            # Réveils figés : garder le dmesg d'une panique dans les variables EFI (amd.py).
+            "efi_pstore.pstore_disable=0",
+        ),
         [Amd()],
     ),
 }
