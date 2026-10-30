@@ -5,8 +5,11 @@ from decman.plugins import pacman
 
 
 class Niri(Module):
-    def __init__(self) -> None:
+    # autologin : ouvrir niri au démarrage au lieu de Plasma. Quitter niri (Ctrl+Alt+Suppr) mène à
+    # l'écran de connexion, où Plasma reste au choix : Relogin est désactivé par défaut.
+    def __init__(self, autologin: bool = False) -> None:
         super().__init__("niri")
+        self.autologin = autologin
 
     @pacman.packages
     def pacman_packages(self) -> set[str]:
@@ -20,7 +23,11 @@ class Niri(Module):
     def files(self) -> dict[str, File]:
         # Verrou de Dux Shell : mot de passe, et YubiKey Bio (pam-u2f, u2f-wait-key et
         # /etc/u2f_mappings viennent de desktop.py).
-        return {
+        files = {
             "/etc/pam.d/dankshell": File(source_file="./files/niri/dankshell"),
             "/etc/pam.d/dankshell-u2f": File(source_file="./files/niri/dankshell-u2f"),
         }
+        if self.autologin:
+            # Lu après autologin.conf (desktop.py), dont il remplace la session.
+            files["/etc/plasmalogin.conf.d/niri.conf"] = File(content="[Autologin]\nSession=niri\n")
+        return files
