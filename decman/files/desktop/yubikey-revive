@@ -13,7 +13,12 @@ case "$1" in
     *) exit 0 ;;
 esac
 
-# Le hub du KVM peut mettre plusieurs secondes à revenir.
+# Juste après le réveil, l'ancien hidraw de la clé existe encore alors que le hub va la déconnecter
+# puis la réénumérer : sondé, il échoue aussitôt et la vraie clé n'est jamais testée (26/10/2026).
+# Laisser passer la déconnexion, puis attendre la clé réénumérée : le hub du KVM peut mettre
+# plusieurs secondes à revenir.
+/usr/bin/sleep 3
+/usr/bin/udevadm settle
 for _ in $(/usr/bin/seq 30); do
     for h in /sys/class/hidraw/*; do
         /usr/bin/grep -qs HID_ID=0003:00001050:00000402 "$h/device/uevent" || continue

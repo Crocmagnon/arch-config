@@ -21,6 +21,8 @@ log_status() {
     /usr/bin/logger -t drm-redetect "$1:$s"
 }
 
+# Dès le dégel : à 3 s, un aller-retour du KVM fait pendant le réveil était déjà passé (30/10/2026).
+log_status 0s
 /usr/bin/sleep 3; log_status 3s
 /usr/bin/sleep 7; log_status 10s
 for c in /sys/class/drm/card*-*/status; do
