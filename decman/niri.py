@@ -19,8 +19,9 @@ class Niri(Module):
             "satty",  # annotation des captures (dms ipc call niri screenshot) ; Spectacle exige KWin
             "wl-mirror",  # niri ne duplique pas un écran : une fenêtre qui en recopie un autre (projecteur)
             "geoclue",  # position pour la bascule clair/sombre de Dux Shell au coucher du soleil
-            # Pas de xdg-desktop-portal-gnome, donc pas de partage d'écran sous niri : il tire
-            # Nautilus, son indexeur et gvfs, qui se verraient aussi sous Plasma.
+            # Partage et capture d'écran sous niri (il imite l'interface de Mutter). Tire Nautilus et
+            # son indexeur : dotfiles garde Dolphin par défaut et masque localsearch.
+            "xdg-desktop-portal-gnome",
         }
 
     def files(self) -> dict[str, File]:
