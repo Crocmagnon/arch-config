@@ -16,6 +16,7 @@ class Niri(Module):
         return {
             "niri", "dux-shell",  # Dux Shell : barre, lanceur, notifications, polkit, verrou
             "xwayland-satellite",  # niri le lance à la demande pour les applis X11
+            "geoclue",  # position pour la bascule clair/sombre de Dux Shell au coucher du soleil
             # Pas de xdg-desktop-portal-gnome, donc pas de partage d'écran sous niri : il tire
             # Nautilus, son indexeur et gvfs, qui se verraient aussi sous Plasma.
         }
@@ -26,6 +27,9 @@ class Niri(Module):
         files = {
             "/etc/pam.d/dankshell": File(source_file="./files/niri/dankshell"),
             "/etc/pam.d/dankshell-u2f": File(source_file="./files/niri/dankshell-u2f"),
+            # Dux Shell (DesktopId « dms ») demande la position à GeoClue. Sans agent (celui de
+            # GNOME), GeoClue ne répond qu'aux applis autorisées ici.
+            "/etc/geoclue/conf.d/90-dms.conf": File(content="[dms]\nallowed=true\nsystem=false\nusers=\n"),
         }
         if self.autologin:
             # Lu après autologin.conf (desktop.py), dont il remplace la session.
