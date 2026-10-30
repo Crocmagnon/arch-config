@@ -17,7 +17,10 @@ key_ready() {
   done
   return 1
 }
+logger -t u2f-wait-key "start (worker $worker)" # DEBUG temporaire
 until key_ready; do
   # Mot de passe saisi, kscreenlocker tue le worker : ne pas lui survivre.
+  kill -0 "$worker" 2>/dev/null || { logger -t u2f-wait-key "worker gone"; exit 1; } # DEBUG temporaire
   sleep 1
 done
+logger -t u2f-wait-key "key ready" # DEBUG temporaire
