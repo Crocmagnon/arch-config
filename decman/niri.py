@@ -1,5 +1,5 @@
-# Essai de niri + Dux Shell, à côté de Plasma : une session de plus sur l'écran de connexion,
-# l'autologin reste sur Plasma. Pour tout retirer : enlever Niri() de source.py, puis sudo decman.
+# niri + Dux Shell, session principale (autologin) ; Plasma reste au choix sur l'écran de connexion,
+# grâce à Niri(autologin=…). Pour tout retirer : enlever Niri() de source.py, puis sudo decman.
 from decman import File, Module
 from decman.plugins import pacman
 
