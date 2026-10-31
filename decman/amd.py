@@ -1,6 +1,4 @@
 # Processeur et GPU AMD (desktop-gab).
-import re
-
 from decman import File, Module, prg
 from decman.plugins import pacman, systemd
 
@@ -40,16 +38,3 @@ class Amd(Module):
     def on_change(self, store) -> None:
         prg(["systemd-tmpfiles", "--create", "/etc/tmpfiles.d/resume-debug.conf"])
         prg(["sysctl", "--system"])
-
-    # Avant le pacman -Syu de decman. Réveils figés sous linux 7.2.11 (4 sur ~20 depuis le 18/10/2026),
-    # aucun sous 7.2.7 à 7.2.9 (~40) : rester en 7.2.9 le temps de le confirmer. pacman.conf
-    # appartient au paquet pacman, d'où une modification en place plutôt qu'un File. À retirer avec
-    # la ligne IgnorePkg une fois la question tranchée.
-    def before_update(self, store) -> None:
-        conf = "/etc/pacman.conf"
-        with open(conf) as f:
-            text = f.read()
-        pinned = re.sub(r"^#?IgnorePkg\s*=.*$", "IgnorePkg   = linux", text, count=1, flags=re.M)
-        if pinned != text:
-            with open(conf, "w") as f:
-                f.write(pinned)
