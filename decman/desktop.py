@@ -66,10 +66,11 @@ class Desktop(Module):
             "/etc/plasmalogin.conf.d/autologin.conf": File(
                 content=f"[Autologin]\nUser={USER}\nSession=plasma\n"
             ),
-            # Empreinte au verrouillage par la YubiKey Bio, derrière le KVM. Le mapping (pamu2fcfg,
+            # YubiKey Bio au verrouillage, derrière le KVM. Le mapping (pamu2fcfg,
             # origine commune pam://gab) ne contient qu'un handle et une clé publique.
             "/etc/u2f_mappings": File(source_file="./files/desktop/u2f_mappings"),
-            "/etc/pam.d/kde-fingerprint": File(source_file="./files/desktop/kde-fingerprint"),
+            # Méthode « clé » du verrou de Plasma (YubiKey Bio) : voir le fichier.
+            "/etc/pam.d/kde-u2f": File(source_file="./files/desktop/kde-u2f"),
             "/usr/local/bin/u2f-wait-key": File(
                 source_file="./files/desktop/u2f-wait-key", permissions=0o755
             ),

@@ -1,6 +1,7 @@
 #!/bin/bash
-# Lancé par pam_exec avant pam_u2f (kde-fingerprint) : attend que la YubiKey Bio soit branchée. Verrouillé
-# KVM basculé, la clé est absente et pam_u2f échouerait aussitôt, sans que kscreenlocker relance.
+# Lancé par pam_exec avant pam_u2f (kde-u2f) : attend que la YubiKey Bio soit branchée. Verrouillé KVM
+# basculé, la clé est absente : pam_u2f échouerait aussitôt, et après plus de trois échecs à moins de 2 s
+# d'intervalle, le verrou déclare la méthode défectueuse jusqu'au verrou suivant.
 # Capot ouvert, pas d'attente : le capteur du laptop répond.
 grep -qs open /proc/acpi/button/lid/*/state && exit 0
 worker=$PPID
