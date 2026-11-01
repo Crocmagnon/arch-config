@@ -1,0 +1,23 @@
+#!/bin/sh
+# Hook systemd-sleep : derrière le hub du KVM, la YubiKey Bio (1050:0402) rate ses réinitialisations
+# au réveil (device descriptor read/64, error -110), et le noyau attend la fin des essais avant de
+# rendre la main : 38 s d'écran noir le 01/11/2026 (pm_print_times), jusqu'à un débranchement ; les
+# réveils bloqués depuis le 23/10 n'ont eu lieu que clé branchée. Couper son port avant la veille, le
+# rallumer au réveil : la clé y est énumérée comme neuve, sans reprise. Même principe que
+# webcam-port-off.
+saved=/run/yubikey-port-off
+
+if [ "$1" = pre ]; then
+    for dev in /sys/bus/usb/devices/*; do
+        [ "$(/usr/bin/cat "$dev/idVendor" 2>/dev/null):$(/usr/bin/cat "$dev/idProduct" 2>/dev/null)" = 1050:0402 ] || continue
+        port=$(/usr/bin/readlink -f "$dev/port") || continue
+        echo "$port" > "$saved"
+        echo 1 > "$port/disable"
+    done
+    exit 0
+fi
+
+[ "$1" = post ] || exit 0
+[ -r "$saved" ] || exit 0
+read -r port < "$saved"; /usr/bin/rm -f "$saved"
+echo 0 > "$port/disable"

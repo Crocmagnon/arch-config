@@ -76,6 +76,10 @@ class Desktop(Module):
             "/usr/local/bin/u2f-wait-key": File(
                 source_file="./files/desktop/u2f-wait-key", permissions=0o755
             ),
+            # Au réveil derrière le KVM, la clé bloque le réveil de toute la machine : voir le fichier.
+            "/usr/lib/systemd/system-sleep/yubikey-port-off": File(
+                source_file="./files/desktop/yubikey-port-off", permissions=0o755
+            ),
             # Au réveil, la clé peut revenir bloquée derrière le KVM : la débrancher par logiciel.
             "/usr/lib/systemd/system-sleep/yubikey-revive": File(
                 source_file="./files/desktop/yubikey-revive", permissions=0o755
