@@ -10,7 +10,7 @@ auth       required                    pam_shells.so
 auth       requisite                   pam_nologin.so
 auth       requisite                   pam_faillock.so      preauth
 auth       optional                    pam_exec.so          quiet /usr/local/bin/u2f-wait-key
-auth       requisite                   pam_u2f.so           authfile=/etc/u2f_mappings origin=pam://gab appid=pam://gab userverification=1 pinverification=0 cue debug debug_file=syslog
+auth       requisite                   pam_u2f.so           authfile=/etc/u2f_mappings origin=pam://gab appid=pam://gab userverification=1 pinverification=0 cue
 auth       optional                    pam_permit.so
 auth       required                    pam_env.so
 
