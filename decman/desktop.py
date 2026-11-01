@@ -71,6 +71,8 @@ class Desktop(Module):
             "/etc/u2f_mappings": File(source_file="./files/desktop/u2f_mappings"),
             # Méthode « clé » du verrou de Plasma (YubiKey Bio) : voir le fichier.
             "/etc/pam.d/kde-u2f": File(source_file="./files/desktop/kde-u2f"),
+            # Demandes d'administration (polkit) validées d'un doigt sur la clé : voir le fichier.
+            "/etc/pam.d/polkit-1": File(source_file="./files/desktop/polkit-1"),
             "/usr/local/bin/u2f-wait-key": File(
                 source_file="./files/desktop/u2f-wait-key", permissions=0o755
             ),

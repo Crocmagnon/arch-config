@@ -1,0 +1,11 @@
+#%PAM-1.0
+# Copie de /usr/lib/pam.d/polkit-1 (polkit), avec la YubiKey Bio d'abord : un doigt valide une demande
+# d'administration (pkexec, applis KDE). Clé absente, pam_u2f échoue aussitôt et le mot de passe est
+# demandé ; présente, la Bio attend un doigt jusqu'à 29 s avant de passer au mot de passe. Pas de
+# u2f-wait-key ici : il bloquerait le mot de passe. Options : celles de kde-u2f. L'assistant polkit
+# tourne isolé ; pam-u2f livre le drop-in qui lui ouvre /dev/hidraw* (polkit-agent-helper@.service.d).
+auth       sufficient   pam_u2f.so   authfile=/etc/u2f_mappings origin=pam://gab appid=pam://gab userverification=1 pinverification=0 cue
+auth       include      system-auth
+account    include      system-auth
+password   include      system-auth
+session    include      system-auth
