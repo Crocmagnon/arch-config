@@ -2,8 +2,8 @@
 # Lancé par pam_exec avant pam_u2f (kde-u2f) : attend que la YubiKey Bio soit branchée. Verrouillé KVM
 # basculé, la clé est absente : pam_u2f échouerait aussitôt, et après plus de trois échecs à moins de 2 s
 # d'intervalle, le verrou déclare la méthode défectueuse jusqu'au verrou suivant.
-# Capot ouvert, pas d'attente : le capteur du laptop répond.
-grep -qs open /proc/acpi/button/lid/*/state && exit 0
+# Même capot ouvert : sans attente, la méthode « clé » du verrou échoue en boucle puis passe en défaut
+# (laptop, 01/11/2026). Le capteur d'empreinte du laptop a sa propre pile (kde-fingerprint), en parallèle.
 worker=$PPID
 # Prête quand elle répond. Accessible ne suffit pas : l'ACL uaccess arrive avec udev, qui au réveil de
 # veille traîne plusieurs secondes derrière l'apparition du périphérique dans /sys, et juste après le
