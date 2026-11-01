@@ -1,11 +1,18 @@
 #%PAM-1.0
-# Copie de /usr/lib/pam.d/polkit-1 (polkit), avec la YubiKey Bio d'abord : un doigt valide une demande
-# d'administration (pkexec, applis KDE). Clé absente, pam_u2f échoue aussitôt et le mot de passe est
-# demandé ; présente, la Bio attend un doigt jusqu'à 29 s avant de passer au mot de passe. Pas de
-# u2f-wait-key ici : il bloquerait le mot de passe. Options : celles de kde-u2f. L'assistant polkit
-# tourne isolé ; pam-u2f livre le drop-in qui lui ouvre /dev/hidraw* (polkit-agent-helper@.service.d).
-auth       sufficient   pam_u2f.so   authfile=/etc/u2f_mappings origin=pam://gab appid=pam://gab userverification=1 pinverification=0 cue
-auth       include      system-auth
-account    include      system-auth
-password   include      system-auth
-session    include      system-auth
+# Copie de /usr/lib/pam.d/polkit-1 (polkit) : une demande d'administration (pkexec, applis KDE) se
+# valide d'un doigt, sinon au mot de passe (system-auth). Chaque étape bloque la suivante : le champ
+# mot de passe de la boîte KDE n'est lu qu'une fois les précédentes abandonnées.
+# 1. Capot ouvert (framework-gab), le capteur d'empreinte du laptop : 3 essais de 30 s au plus
+#    (défauts de pam_fprintd). Capot fermé, ou sans capot (desktop-gab), la ligne pam_exec réussit
+#    et saute fprintd (les crochets passent la commande en un seul argument). « -auth » : sans fprintd
+#    (desktop-gab), le module manquant est ignoré.
+# 2. La YubiKey Bio : absente, échec aussitôt ; présente, elle attend un doigt jusqu'à 29 s. Pas de
+#    u2f-wait-key ici : il bloquerait le mot de passe. Options : celles de kde-u2f. L'assistant polkit
+#    tourne isolé ; pam-u2f livre le drop-in qui lui ouvre /dev/hidraw* (polkit-agent-helper@.service.d).
+auth       [success=1 default=ignore]  pam_exec.so  quiet /bin/sh -c [! grep -qs open /proc/acpi/button/lid/*/state]
+-auth      sufficient                  pam_fprintd.so
+auth       sufficient                  pam_u2f.so   authfile=/etc/u2f_mappings origin=pam://gab appid=pam://gab userverification=1 pinverification=0 cue
+auth       include                     system-auth
+account    include                     system-auth
+password   include                     system-auth
+session    include                     system-auth

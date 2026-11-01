@@ -107,7 +107,7 @@ Ses `custom_commands` font deux choses :
 
 - `desktop.py` : la session Plasma et les services du bureau.
   - Plasma et ses applications, plasma-login-manager en autologin.
-  - La YubiKey Bio au verrouillage (la méthode « clé » du verrou de Plasma, service PAM `kde-u2f`, activée dans dotfiles) et pour les demandes d'administration polkit (un doigt, sinon le mot de passe). sudo est sans mot de passe, donc pas concerné.
+  - La YubiKey Bio au verrouillage (la méthode « clé » du verrou de Plasma, service PAM `kde-u2f`, activée dans dotfiles) et pour les demandes d'administration polkit (un doigt sur la clé, ou capot ouvert sur le capteur du laptop, sinon le mot de passe). sudo est sans mot de passe, donc pas concerné.
   - Audio, Bluetooth, impression (la Brother réseau en IPP sans pilote, déclarée par `lpadmin`), Docker, Tailscale, iPhone, VM (libvirt et virt-manager).
   - ufw (entrée refusée, sauf KDE Connect et le réseau NAT de libvirt ; ports Docker publiés sur localhost seulement, `-p 0.0.0.0:…` pour les ouvrir au LAN ; `rp_filter` lâche pour l'exit node Tailscale), Flatpak (PrusaSlicer, mis à jour chaque jour par `flatpak-update.timer`), `fwupd-refresh.timer` (métadonnées des firmwares seulement).
 - `apps.py` : les applications (Firefox, Chromium, Signal, Thunderbird, FreeCAD, LibreOffice, calibre, Steam, openscad-git, PulseView…), les outils en ligne de commande qui ne viennent pas de mise, et nRF Connect (AUR), dont la dépendance J-Link est figée (`source.py`). L'AUR reste minimal : Claude Code et fresh viennent des dotfiles, RustDesk de Flatpak.
