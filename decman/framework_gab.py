@@ -34,12 +34,6 @@ class FrameworkGab(Module):
             "/etc/systemd/sleep.conf.d/hibernate.conf": File(
                 content="[Sleep]\nHibernateDelaySec=60min\nHibernateMode=shutdown\n"
             ),
-            # Capot hors Plasma (niri) : sous Plasma, powerdevil prend la main sur logind. Même chose
-            # que son réglage : veille puis hibernation sur batterie, rien sur secteur ; capot ignoré
-            # avec un écran externe (défaut de logind).
-            "/etc/systemd/logind.conf.d/lid.conf": File(
-                content="[Login]\nHandleLidSwitch=suspend-then-hibernate\nHandleLidSwitchExternalPower=ignore\n"
-            ),
             # Après une hibernation de plus de 5 min, la passphrase LUKS vient d'être saisie : lever
             # le verrouillage de Plasma. Les hooks de veille ne sont lus que dans /usr/lib.
             "/usr/lib/systemd/system-sleep/unlock-after-hibernate": File(
@@ -64,5 +58,3 @@ class FrameworkGab(Module):
         prg(["sh", "-c", "grep -q '^term_font_scale:' /boot/limine.conf"
              " || { sed -i '/^timeout:/i term_font_scale: 2x2' /boot/limine.conf"
              " && grep -q '^term_font_scale:' /boot/limine.conf; }"])
-        # logind relit sa config sur SIGHUP ; un restart fermerait les sessions.
-        prg(["systemctl", "kill", "-s", "HUP", "systemd-logind"])

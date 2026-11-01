@@ -35,6 +35,10 @@ class Desktop(Module):
             # VM (virt-manager) : dnsmasq pour le réseau NAT « default », swtpm pour un TPM virtuel
             "libvirt", "qemu-desktop", "virt-manager", "virtiofsd", "swtpm", "edk2-ovmf", "dnsmasq",
             "pam-u2f", "yubikey-manager",  # YubiKey Bio au verrouillage ; ykman pour enrôler les empreintes
+            # Position pour le thème sombre la nuit (knighttimed, via Qt Positioning) ; sans GeoClue,
+            # la position automatique échoue (« The name is not activatable »). Sans agent GeoClue,
+            # comme sous Plasma, toute appli obtient la position.
+            "geoclue",
         }
 
     @aur.packages

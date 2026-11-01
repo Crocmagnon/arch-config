@@ -16,7 +16,6 @@ from desktop import Desktop
 from framework_gab import FrameworkGab
 from intel import Intel
 from maintenance import Maintenance
-from niri import Niri
 
 # Un fichier /etc appartenant à un paquet pas encore installé ferait échouer pacman
 # (« existe déjà dans le système de fichiers ») : on installe d'abord, on écrit ensuite.
@@ -69,4 +68,4 @@ JLINK = "jlink-software-and-documentation"
 if subprocess.run(["pacman", "-Q", JLINK], capture_output=True).returncode == 0:
     decman.aur.ignored_packages.add(JLINK)
 
-decman.modules += [Base(), Boot(kernel_params), Desktop(), Niri(autologin=True), Apps(), *host_modules, Maintenance(USER), users, keys]
+decman.modules += [Base(), Boot(kernel_params), Desktop(), Apps(), *host_modules, Maintenance(USER), users, keys]
