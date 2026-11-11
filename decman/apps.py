@@ -16,7 +16,7 @@ class Apps(Module):
             "libreoffice-still", "calibre", "tldr", "filelight",
             "steam",  # dépôt multilib, activé par archinstall ; pilote Vulkan dans le module du GPU
             "fuse2",  # AppImages (Rotatrix)
-            "git-lfs", "unzip", "bind", "jq", "age", "watchexec", "htop", "btop", "clang",
+            "git-lfs", "unzip", "bind", "nmap", "jq", "age", "watchexec", "htop", "btop", "clang",
             "vscode-json-languageserver", "yaml-language-server",
             "luarocks", "luacheck", "busted",  # outils Lua absents de mise (luajit, stylua, lua-language-server y sont)
             "nix",  # flakes des repos qui en ont un (downloader-go)
